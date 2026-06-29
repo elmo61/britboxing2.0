@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Nuxt / build output
+.nuxt/
+.output/
+.data/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment / secrets
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
