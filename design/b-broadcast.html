@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction B — Broadcast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --uj-red:#e11d2a; --uj-blue:#1e64d6; --navy:#0a1326; --panel:#101c36;
+    --ink:#eaf0fb; --muted:#8493b0; --line:#21304f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--navy);color:var(--ink);font-family:"Inter",sans-serif;}
+  .cond{font-family:"Saira Condensed",sans-serif;}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 22px 60px;}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+  .mark{display:flex;align-items:center;gap:10px;}
+  .logo{font-family:"Saira Condensed";font-weight:700;font-size:1.9rem;text-transform:uppercase;letter-spacing:.01em;}
+  .logo b{color:var(--uj-red);font-weight:700;} .logo i{color:var(--uj-blue);font-style:normal;}
+  .live{margin-left:auto;display:flex;align-items:center;gap:7px;font-family:"Saira Condensed";
+    font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:.8rem;color:var(--uj-red);}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--uj-red);}
+  .flag{width:34px;height:24px;border-radius:3px;}
+  /* hero */
+  .hero{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--panel);}
+  .htop{display:grid;grid-template-columns:1fr auto 1fr;}
+  .side{padding:22px 20px;position:relative;}
+  .side.redc{background:linear-gradient(180deg,rgba(225,29,42,.22),transparent 70%);}
+  .side.bluec{background:linear-gradient(180deg,rgba(30,100,214,.22),transparent 70%);text-align:right;}
+  .corner{font-family:"Saira Condensed";font-weight:700;text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;}
+  .redc .corner{color:#ff5b66;} .bluec .corner{color:#6aa0f5;}
+  .fname{font-family:"Saira Condensed";font-weight:700;font-size:2.4rem;line-height:.98;text-transform:uppercase;margin:8px 0 4px;}
+  .rec{font-family:"Saira Condensed";font-weight:600;font-size:1.2rem;color:var(--ink);}
+  .vs{align-self:center;font-family:"Saira Condensed";font-weight:700;font-size:1.5rem;color:var(--muted);padding:0 4px;}
+  .meta{display:flex;justify-content:center;gap:18px;padding:10px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    font-family:"Saira Condensed";font-weight:600;text-transform:uppercase;letter-spacing:.14em;font-size:.74rem;color:var(--muted);}
+  .meta b{color:var(--ink);}
+  /* stat bars */
+  .stats{padding:18px 22px 22px;}
+  .stat{margin:12px 0;}
+  .slab{display:flex;justify-content:space-between;font-family:"Saira Condensed";font-weight:600;
+    text-transform:uppercase;letter-spacing:.1em;font-size:.74rem;color:var(--muted);margin-bottom:5px;}
+  .slab b{color:var(--ink);font-size:.95rem;}
+  .bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:#0c1730;}
+  .bar .a{background:var(--uj-red);} .bar .b{background:var(--uj-blue);}
+  .gap{width:2px;background:var(--navy);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark">
+      <svg class="flag" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg">
+        <rect width="60" height="30" fill="#012169"/>
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#e11d2a" stroke-width="3"/>
+        <rect x="25" width="10" height="30" fill="#fff"/><rect y="10" width="60" height="10" fill="#fff"/>
+        <rect x="27" width="6" height="30" fill="#e11d2a"/><rect y="12" width="60" height="6" fill="#e11d2a"/>
+      </svg>
+      <div class="logo"><b>Brit</b><i>Boxing</i></div>
+    </div>
+    <div class="live"><span class="dot"></span>Fight week</div>
+  </header>
+
+  <div class="hero">
+    <div class="htop">
+      <div class="side redc">
+        <div class="corner">● Red corner</div>
+        <div class="fname cond">Anthony<br>Joshua</div>
+        <div class="rec">29–4 · 26 KO</div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="side bluec">
+        <div class="corner">Blue corner ●</div>
+        <div class="fname cond">Daniel<br>Dubois</div>
+        <div class="rec">23–3 · 22 KO</div>
+      </div>
+    </div>
+    <div class="meta"><span>Heavyweight</span><span>·</span><span>12 rounds</span><span>·</span><span><b>The O2</b></span></div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="slab"><b>90%</b><span>KO rate</span><b>96%</b></div>
+        <div class="bar"><div class="a" style="width:48%"></div><div class="gap"></div><div class="b" style="width:52%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="slab"><b>82″</b><span>Reach</span><b>78″</b></div>
+        <div class="bar"><div class="a" style="width:53%"></div><div class="gap"></div><div class="b" style="width:47%"></div></div>
+      </div>
+      <div class="stat">
+        <div class="slab"><b>36</b><span>Age</span><b>28</b></div>
+        <div class="bar"><div class="a" style="width:56%"></div><div class="gap"></div><div class="b" style="width:44%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
