@@ -1,0 +1,123 @@
+{
+  "bout": {
+    "fighter_a": "Canelo Álvarez",
+    "fighter_b": "Christian M'billi",
+    "weightClass": "Super Middleweight",
+    "headline": "Report: Canelo's title bout vs. Mbilli pushed to Oct.",
+    "source": "ESPN",
+    "link": "https://www.espn.com/boxing/story/_/id/49202519/report-alvarez-title-bout-vs-mbilli-pushed-late-october",
+    "published": "Sun, 28 Jun 2026 10:18:20 EST"
+  },
+  "fighter_a_snapshot": {
+    "capturedAt": "2026-06-29T22:19:07+00:00",
+    "version": 1,
+    "record": {
+      "wins": 63,
+      "losses": 3,
+      "draws": 2,
+      "winsKo": 39,
+      "winsDec": 24,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LDEC",
+        "WDEC",
+        "WDEC",
+        "WDEC",
+        "WDEC"
+      ],
+      "kosInLastFive": 0,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 35,
+      "heightInches": 68,
+      "reachInches": 70,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Canelo Álvarez",
+      "realName": "{{nowrap|Santos Saúl Álvarez Barragán}}",
+      "nationality": null,
+      "weightClasses": [
+        "Welterweight",
+        "Light middleweight",
+        "Middleweight",
+        "Super middleweight",
+        "Light heavyweight"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Canelo_Álvarez",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "fighter_b_snapshot": {
+    "capturedAt": "2026-06-29T22:19:08+00:00",
+    "version": 1,
+    "record": {
+      "wins": 29,
+      "losses": null,
+      "draws": 1,
+      "winsKo": 24,
+      "winsDec": 5,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "DRAW",
+        "WKO",
+        "WDEC",
+        "WKO",
+        "WDEC"
+      ],
+      "kosInLastFive": 2,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 31,
+      "heightInches": 68,
+      "reachInches": 72,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Christian M'billi",
+      "realName": "Christian Mbilli Assomo-Hallier",
+      "nationality": null,
+      "weightClasses": [
+        "Middleweight",
+        "Super middleweight"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Christian_M'billi",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "system_prompt": "You are a British boxing journalist writing fight-preview articles for BritBoxing (britboxing.co.uk). Tone: UK broadsheet boxing desk — factual, measured, no hype clichés ('all-action war', 'fireworks'). PURPOSE: help the reader understand the two boxers and how the fight shapes up. This is editorial about the fighters, NOT a betting tip — do not discuss odds, who is the favourite, or give a win/method prediction. WRITE FOR VARIETY — this is important. Every preview must feel written from scratch for THIS fight, not poured into a template. Before writing, find the single most interesting angle this matchup's data suggests — a huge experience gap, two unbeaten punchers, a reach mismatch, a veteran slowing down, a prospect's step up — and build the piece around THAT. Vary your opening every time (never default to 'When a fight involves…'); vary the order you introduce the fighters; vary your section headings and how many sections you use; vary article length to fit how much the data supports. The structure below is a checklist of what to COVER, not a running order to follow. Two previews placed side by side should read as clearly different pieces. EMPHASIS: where one fighter is far more famous, weight the piece toward the lesser-known opponent — readers arrive knowing the big name. Where both are comparably known, treat them evenly. DATA DISCIPLINE: use ONLY the statistics provided in the prompt. Never invent records, rankings, dates, venues, quotes or biographical detail. If a stat is null/unknown, simply leave it out — never state that a figure is missing or unavailable. Use a stat only when it is genuinely informative (e.g. a clear reach or experience advantage); skip differences that are marginal. Form data marked unverified may be described softly ('recent outings suggest') or omitted. Do not refer to yourself, to AI, or to how the article was produced. HOUSE STYLE — write like a person, not a model. Hard rules: NEVER use an em dash (—) or en dash (–); use commas, full stops or brackets and recast the sentence. Use straight quotes and apostrophes, not curly ones. Avoid these tell-tale constructions: 'not just X but Y' and 'it's not X, it's Y'; 'not a … so much as …'; semicolon antithesis ('one has X; the other has Y'); rule-of-three lists for rhythm; and ending on a rhetorical 'the question is whether…'. Vary how each article closes. Avoid filler/marketing words (testament, stark reminder, delve, tapestry, landscape, realm, navigate, underscore, boasts, showcase, leverage, crucial, pivotal, robust) and hedging openers (That said, Ultimately, It's worth noting, When it comes to, In a world where). Vary sentence length; let some sentences be short and plain. Return ONLY a JSON object with keys: title, slug, body, summary, tags. 'body' is HTML (<p>, <h2>, <ul>) — no <html>/<head>. 'tags' is an array of strings.",
+  "user_prompt": "Write a fight-preview article for the following bout.\n\n## Bout\n- Matchup: Canelo Álvarez vs Christian M'billi\n- Announced via: ESPN — headline: \"Report: Canelo's title bout vs. Mbilli pushed to Oct.\"\n- Source link: https://www.espn.com/boxing/story/_/id/49202519/report-alvarez-title-bout-vs-mbilli-pushed-late-october\n- Weight class (heaviest division both fighters share): Super Middleweight\n\n## Fighter A — Canelo Álvarez\n{\n  \"capturedAt\": \"2026-06-29T22:19:07+00:00\",\n  \"version\": 1,\n  \"record\": {\n    \"wins\": 63,\n    \"losses\": 3,\n    \"draws\": 2,\n    \"winsKo\": 39,\n    \"winsDec\": 24,\n    \"noContests\": null\n  },\n  \"form\": {\n    \"currentStreak\": 0,\n    \"streakType\": null,\n    \"last5\": [\n      \"LDEC\",\n      \"WDEC\",\n      \"WDEC\",\n      \"WDEC\",\n      \"WDEC\"\n    ],\n    \"kosInLastFive\": 0,\n    \"_unverified\": true\n  },\n  \"physical\": {\n    \"age\": 35,\n    \"heightInches\": 68,\n    \"reachInches\": 70,\n    \"stance\": \"Orthodox\"\n  },\n  \"standing\": {\n    \"titlesHeld\": null,\n    \"rankings\": {\n      \"wbc\": null,\n      \"wbo\": null,\n      \"ibf\": null,\n      \"wba\": null\n    }\n  },\n  \"_meta\": {\n    \"name\": \"Canelo Álvarez\",\n    \"realName\": \"{{nowrap|Santos Saúl Álvarez Barragán}}\",\n    \"nationality\": null,\n    \"weightClasses\": [\n      \"Welterweight\",\n      \"Light middleweight\",\n      \"Middleweight\",\n      \"Super middleweight\",\n      \"Light heavyweight\"\n    ],\n    \"source\": \"https://en.wikipedia.org/wiki/Canelo_Álvarez\",\n    \"license\": \"Text CC BY-SA 4.0 — attribute Wikipedia on display.\",\n    \"needsVerification\": null,\n    \"formIsUnverified\": true\n  }\n}\n\n## Fighter B — Christian M'billi\n{\n  \"capturedAt\": \"2026-06-29T22:19:08+00:00\",\n  \"version\": 1,\n  \"record\": {\n    \"wins\": 29,\n    \"losses\": null,\n    \"draws\": 1,\n    \"winsKo\": 24,\n    \"winsDec\": 5,\n    \"noContests\": null\n  },\n  \"form\": {\n    \"currentStreak\": 0,\n    \"streakType\": null,\n    \"last5\": [\n      \"DRAW\",\n      \"WKO\",\n      \"WDEC\",\n      \"WKO\",\n      \"WDEC\"\n    ],\n    \"kosInLastFive\": 2,\n    \"_unverified\": true\n  },\n  \"physical\": {\n    \"age\": 31,\n    \"heightInches\": 68,\n    \"reachInches\": 72,\n    \"stance\": \"Orthodox\"\n  },\n  \"standing\": {\n    \"titlesHeld\": null,\n    \"rankings\": {\n      \"wbc\": null,\n      \"wbo\": null,\n      \"ibf\": null,\n      \"wba\": null\n    }\n  },\n  \"_meta\": {\n    \"name\": \"Christian M'billi\",\n    \"realName\": \"Christian Mbilli Assomo-Hallier\",\n    \"nationality\": null,\n    \"weightClasses\": [\n      \"Middleweight\",\n      \"Super middleweight\"\n    ],\n    \"source\": \"https://en.wikipedia.org/wiki/Christian_M'billi\",\n    \"license\": \"Text CC BY-SA 4.0 — attribute Wikipedia on display.\",\n    \"needsVerification\": null,\n    \"formIsUnverified\": true\n  }\n}\n\n## What to cover (a checklist, NOT a running order — arrange it your own way for this fight)\n- A sense of each fighter: record, how they win (KO vs decision), recent outings.\n- The genuinely informative contrasts (a clear experience, finishing-rate, reach\n  or age gap). Skip stats that are missing or marginal.\n- The stylistic questions the numbers raise — what each fighter must do.\nLead with whatever is most interesting about THIS matchup; vary your structure,\nheadings and opening from other previews. No odds, no favourite, no prediction.\n\nRemember: invent nothing; use only the JSON above. Omit anything you don't have\ndata for — never mention that a figure is missing. Return the JSON object only.\n",
+  "model": "claude-sonnet-4-6"
+}

@@ -1,0 +1,66 @@
+{
+  "id": "richard-riakporhe",
+  "name": "Richard Riakporhe",
+  "dob": "1990-01-05",
+  "wikipediaTitle": "Richard_Riakporhe",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:39+00:00",
+    "version": 1,
+    "record": {
+      "wins": 20,
+      "losses": 1,
+      "draws": null,
+      "winsKo": 16,
+      "winsDec": 4,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 3,
+      "streakType": "KO",
+      "last5": [
+        "WKO",
+        "WKO",
+        "WDEC",
+        "LDEC",
+        "WKO"
+      ],
+      "kosInLastFive": 3,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 36,
+      "dob": "1990-01-05",
+      "heightInches": 77,
+      "reachInches": 77,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Richard Riakporhe",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Heavyweight",
+        "Cruiserweight (boxing)"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Richard_Riakporhe",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "richard-riakporhe-vs-chris-billam-smith"
+  ],
+  "updatedAt": "2026-06-29T22:57:40+00:00"
+}

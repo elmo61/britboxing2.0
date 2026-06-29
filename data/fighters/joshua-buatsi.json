@@ -1,0 +1,65 @@
+{
+  "id": "joshua-buatsi",
+  "name": "Joshua Buatsi",
+  "dob": "1993-03-14",
+  "wikipediaTitle": "Joshua_Buatsi",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:40+00:00",
+    "version": 1,
+    "record": {
+      "wins": 20,
+      "losses": 1,
+      "draws": null,
+      "winsKo": 13,
+      "winsDec": 7,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 1,
+      "streakType": "Decision",
+      "last5": [
+        "WDEC",
+        "LDEC",
+        "WDEC",
+        "WDEC",
+        "WDEC"
+      ],
+      "kosInLastFive": 0,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 33,
+      "dob": "1993-03-14",
+      "heightInches": 74,
+      "reachInches": 74,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Joshua Buatsi",
+      "realName": null,
+      "nationality": "British, Ghanaian",
+      "weightClasses": [
+        "Light heavyweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Joshua_Buatsi",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "joshua-buatsi-vs-anthony-yarde"
+  ],
+  "updatedAt": "2026-06-29T22:57:41+00:00"
+}

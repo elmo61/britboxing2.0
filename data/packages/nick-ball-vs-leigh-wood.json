@@ -1,0 +1,127 @@
+{
+  "bout": {
+    "fighter_a": "Nick Ball",
+    "fighter_b": "Leigh Wood",
+    "fighterAId": "nick-ball",
+    "fighterBId": "leigh-wood",
+    "weightClass": "Featherweight",
+    "eventDate": null,
+    "announcedAt": null,
+    "headline": "Nick Ball vs Leigh Wood",
+    "source": "Sample matchup (illustrative, not an announced fight)",
+    "link": ""
+  },
+  "fighter_a_snapshot": {
+    "capturedAt": "2026-06-29T22:57:43+00:00",
+    "version": 1,
+    "record": {
+      "wins": 23,
+      "losses": 1,
+      "draws": 1,
+      "winsKo": 13,
+      "winsDec": 10,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LKO",
+        "WDEC",
+        "WDEC",
+        "WKO",
+        "WDEC"
+      ],
+      "kosInLastFive": 1,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 29,
+      "dob": "1997-02-28",
+      "heightInches": 62,
+      "reachInches": 65,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Nick Ball",
+      "realName": null,
+      "nationality": "British",
+      "weightClasses": [
+        "Featherweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Nick_Ball_(boxer)",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "fighter_b_snapshot": {
+    "capturedAt": "2026-06-29T22:57:44+00:00",
+    "version": 1,
+    "record": {
+      "wins": 29,
+      "losses": 4,
+      "draws": null,
+      "winsKo": 17,
+      "winsDec": 12,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 1,
+      "streakType": "Decision",
+      "last5": [
+        "WDEC",
+        "LKO",
+        "WKO",
+        "WDEC",
+        "LKO"
+      ],
+      "kosInLastFive": 1,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 37,
+      "dob": "1988-08-01",
+      "heightInches": 67,
+      "reachInches": 67,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Leigh Wood",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Super bantamweight",
+        "Featherweight",
+        "Super featherweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Leigh_Wood_(boxer)",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "system_prompt": "You are a British boxing journalist writing fight-preview articles for BritBoxing (britboxing.co.uk). Tone: UK broadsheet boxing desk — factual, measured, no hype clichés ('all-action war', 'fireworks'). PURPOSE: help the reader understand the two boxers and how the fight shapes up. This is editorial about the fighters, NOT a betting tip — do not discuss odds, who is the favourite, or give a win/method prediction. WRITE FOR VARIETY — this is important. Every preview must feel written from scratch for THIS fight, not poured into a template. Before writing, find the single most interesting angle this matchup's data suggests — a huge experience gap, two unbeaten punchers, a reach mismatch, a veteran slowing down, a prospect's step up — and build the piece around THAT. Vary your opening every time (never default to 'When a fight involves…'); vary the order you introduce the fighters; vary your section headings and how many sections you use; vary article length to fit how much the data supports. The structure below is a checklist of what to COVER, not a running order to follow. Two previews placed side by side should read as clearly different pieces. EMPHASIS: where one fighter is far more famous, weight the piece toward the lesser-known opponent — readers arrive knowing the big name. Where both are comparably known, treat them evenly. DATA DISCIPLINE: use ONLY the statistics provided in the prompt. Never invent records, rankings, dates, venues, quotes or biographical detail. If a stat is null/unknown, simply leave it out — never state that a figure is missing or unavailable. Use a stat only when it is genuinely informative (e.g. a clear reach or experience advantage); skip differences that are marginal. Form data marked unverified may be described softly ('recent outings suggest') or omitted. Do not refer to yourself, to AI, or to how the article was produced. HOUSE STYLE — write like a person, not a model. Hard rules: NEVER use an em dash (—) or en dash (–); use commas, full stops or brackets and recast the sentence. Use straight quotes and apostrophes, not curly ones. Avoid these tell-tale constructions: 'not just X but Y' and 'it's not X, it's Y'; 'not a … so much as …'; semicolon antithesis ('one has X; the other has Y'); rule-of-three lists for rhythm; and ending on a rhetorical 'the question is whether…'. Vary how each article closes. Avoid filler/marketing words (testament, stark reminder, delve, tapestry, landscape, realm, navigate, underscore, boasts, showcase, leverage, crucial, pivotal, robust) and hedging openers (That said, Ultimately, It's worth noting, When it comes to, In a world where). Vary sentence length; let some sentences be short and plain. Return ONLY a JSON object with keys: title, slug, body, summary, tags. 'body' is HTML (<p>, <h2>, <ul>) — no <html>/<head>. 'tags' is an array of strings.",
+  "user_prompt": "Write a fight-preview article for the following bout.\n\n## Bout\n- Matchup: Nick Ball vs Leigh Wood\n- Announced via: Sample matchup (illustrative, not an announced fight) — headline: \"Nick Ball vs Leigh Wood\"\n- Source link: \n- Event date: to be confirmed\n- Weight class (heaviest division both fighters share): Featherweight\n\n## Fighter A — Nick Ball\n{\n  \"capturedAt\": \"2026-06-29T22:57:43+00:00\",\n  \"version\": 1,\n  \"record\": {\n    \"wins\": 23,\n    \"losses\": 1,\n    \"draws\": 1,\n    \"winsKo\": 13,\n    \"winsDec\": 10,\n    \"noContests\": null\n  },\n  \"form\": {\n    \"currentStreak\": 0,\n    \"streakType\": null,\n    \"last5\": [\n      \"LKO\",\n      \"WDEC\",\n      \"WDEC\",\n      \"WKO\",\n      \"WDEC\"\n    ],\n    \"kosInLastFive\": 1,\n    \"_unverified\": true\n  },\n  \"physical\": {\n    \"age\": 29,\n    \"dob\": \"1997-02-28\",\n    \"heightInches\": 62,\n    \"reachInches\": 65,\n    \"stance\": \"Orthodox\"\n  },\n  \"standing\": {\n    \"titlesHeld\": null,\n    \"rankings\": {\n      \"wbc\": null,\n      \"wbo\": null,\n      \"ibf\": null,\n      \"wba\": null\n    }\n  },\n  \"_meta\": {\n    \"name\": \"Nick Ball\",\n    \"realName\": null,\n    \"nationality\": \"British\",\n    \"weightClasses\": [\n      \"Featherweight\"\n    ],\n    \"hasWikipedia\": true,\n    \"source\": \"https://en.wikipedia.org/wiki/Nick_Ball_(boxer)\",\n    \"license\": \"Text CC BY-SA 4.0 — attribute Wikipedia on display.\",\n    \"needsVerification\": null,\n    \"formIsUnverified\": true\n  }\n}\n\n## Fighter B — Leigh Wood\n{\n  \"capturedAt\": \"2026-06-29T22:57:44+00:00\",\n  \"version\": 1,\n  \"record\": {\n    \"wins\": 29,\n    \"losses\": 4,\n    \"draws\": null,\n    \"winsKo\": 17,\n    \"winsDec\": 12,\n    \"noContests\": null\n  },\n  \"form\": {\n    \"currentStreak\": 1,\n    \"streakType\": \"Decision\",\n    \"last5\": [\n      \"WDEC\",\n      \"LKO\",\n      \"WKO\",\n      \"WDEC\",\n      \"LKO\"\n    ],\n    \"kosInLastFive\": 1,\n    \"_unverified\": true\n  },\n  \"physical\": {\n    \"age\": 37,\n    \"dob\": \"1988-08-01\",\n    \"heightInches\": 67,\n    \"reachInches\": 67,\n    \"stance\": \"Orthodox\"\n  },\n  \"standing\": {\n    \"titlesHeld\": null,\n    \"rankings\": {\n      \"wbc\": null,\n      \"wbo\": null,\n      \"ibf\": null,\n      \"wba\": null\n    }\n  },\n  \"_meta\": {\n    \"name\": \"Leigh Wood\",\n    \"realName\": null,\n    \"nationality\": null,\n    \"weightClasses\": [\n      \"Super bantamweight\",\n      \"Featherweight\",\n      \"Super featherweight\"\n    ],\n    \"hasWikipedia\": true,\n    \"source\": \"https://en.wikipedia.org/wiki/Leigh_Wood_(boxer)\",\n    \"license\": \"Text CC BY-SA 4.0 — attribute Wikipedia on display.\",\n    \"needsVerification\": null,\n    \"formIsUnverified\": true\n  }\n}\n\n## What to cover (a checklist, NOT a running order — arrange it your own way for this fight)\n- A sense of each fighter: record, how they win (KO vs decision), recent outings.\n- The genuinely informative contrasts (a clear experience, finishing-rate, reach\n  or age gap). Skip stats that are missing or marginal.\n- The stylistic questions the numbers raise — what each fighter must do.\nLead with whatever is most interesting about THIS matchup; vary your structure,\nheadings and opening from other previews. No odds, no favourite, no prediction.\n\nRemember: invent nothing; use only the JSON above. Omit anything you don't have\ndata for — never mention that a figure is missing. Return the JSON object only.\n",
+  "model": "claude-sonnet-4-6"
+}

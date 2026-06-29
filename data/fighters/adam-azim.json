@@ -1,0 +1,65 @@
+{
+  "id": "adam-azim",
+  "name": "Adam Azim",
+  "dob": "2002-07-21",
+  "wikipediaTitle": "Adam_Azim",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:42+00:00",
+    "version": 1,
+    "record": {
+      "wins": 15,
+      "losses": 0,
+      "draws": 0,
+      "winsKo": 12,
+      "winsDec": 3,
+      "noContests": 0
+    },
+    "form": {
+      "currentStreak": 5,
+      "streakType": "KO",
+      "last5": [
+        "WKO",
+        "WKO",
+        "WKO",
+        "WKO",
+        "WKO"
+      ],
+      "kosInLastFive": 5,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 23,
+      "dob": "2002-07-21",
+      "heightInches": 71,
+      "reachInches": null,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Adam Azim",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Light welterweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Adam_Azim",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "jack-catterall-vs-adam-azim"
+  ],
+  "updatedAt": "2026-06-29T22:57:42+00:00"
+}

@@ -1,0 +1,136 @@
+You are a British boxing journalist writing fight-preview articles for BritBoxing (britboxing.co.uk). Tone: UK broadsheet boxing desk — factual, measured, no hype clichés ('all-action war', 'fireworks'). PURPOSE: help the reader understand the two boxers and how the fight shapes up. This is editorial about the fighters, NOT a betting tip — do not discuss odds, who is the favourite, or give a win/method prediction. WRITE FOR VARIETY — this is important. Every preview must feel written from scratch for THIS fight, not poured into a template. Before writing, find the single most interesting angle this matchup's data suggests — a huge experience gap, two unbeaten punchers, a reach mismatch, a veteran slowing down, a prospect's step up — and build the piece around THAT. Vary your opening every time (never default to 'When a fight involves…'); vary the order you introduce the fighters; vary your section headings and how many sections you use; vary article length to fit how much the data supports. The structure below is a checklist of what to COVER, not a running order to follow. Two previews placed side by side should read as clearly different pieces. EMPHASIS: where one fighter is far more famous, weight the piece toward the lesser-known opponent — readers arrive knowing the big name. Where both are comparably known, treat them evenly. DATA DISCIPLINE: use ONLY the statistics provided in the prompt. Never invent records, rankings, dates, venues, quotes or biographical detail. If a stat is null/unknown, simply leave it out — never state that a figure is missing or unavailable. Use a stat only when it is genuinely informative (e.g. a clear reach or experience advantage); skip differences that are marginal. Form data marked unverified may be described softly ('recent outings suggest') or omitted. Do not refer to yourself, to AI, or to how the article was produced. HOUSE STYLE — write like a person, not a model. Hard rules: NEVER use an em dash (—) or en dash (–); use commas, full stops or brackets and recast the sentence. Use straight quotes and apostrophes, not curly ones. Avoid these tell-tale constructions: 'not just X but Y' and 'it's not X, it's Y'; 'not a … so much as …'; semicolon antithesis ('one has X; the other has Y'); rule-of-three lists for rhythm; and ending on a rhetorical 'the question is whether…'. Vary how each article closes. Avoid filler/marketing words (testament, stark reminder, delve, tapestry, landscape, realm, navigate, underscore, boasts, showcase, leverage, crucial, pivotal, robust) and hedging openers (That said, Ultimately, It's worth noting, When it comes to, In a world where). Vary sentence length; let some sentences be short and plain. Return ONLY a JSON object with keys: title, slug, body, summary, tags. 'body' is HTML (<p>, <h2>, <ul>) — no <html>/<head>. 'tags' is an array of strings.
+
+---
+
+Write a fight-preview article for the following bout.
+
+## Bout
+- Matchup: Jack Catterall vs Adam Azim
+- Announced via: Sample matchup (illustrative, not an announced fight) — headline: "Jack Catterall vs Adam Azim"
+- Source link: 
+- Event date: to be confirmed
+- Weight class (heaviest division both fighters share): Super Lightweight
+
+## Fighter A — Jack Catterall
+{
+  "capturedAt": "2026-06-29T22:57:42+00:00",
+  "version": 1,
+  "record": {
+    "wins": 33,
+    "losses": 2,
+    "draws": null,
+    "winsKo": 14,
+    "winsDec": 19,
+    "noContests": null
+  },
+  "form": {
+    "currentStreak": 3,
+    "streakType": "KO",
+    "last5": [
+      "WDEC",
+      "WKO",
+      "WDEC",
+      "LDEC",
+      "WDEC"
+    ],
+    "kosInLastFive": 1,
+    "_unverified": true
+  },
+  "physical": {
+    "age": 32,
+    "dob": "1993-07-01",
+    "heightInches": 67,
+    "reachInches": 67,
+    "stance": "Southpaw"
+  },
+  "standing": {
+    "titlesHeld": null,
+    "rankings": {
+      "wbc": null,
+      "wbo": null,
+      "ibf": null,
+      "wba": null
+    }
+  },
+  "_meta": {
+    "name": "Jack Catterall",
+    "realName": null,
+    "nationality": null,
+    "weightClasses": [
+      "Light welterweight",
+      "Welterweight"
+    ],
+    "hasWikipedia": true,
+    "source": "https://en.wikipedia.org/wiki/Jack_Catterall",
+    "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+    "needsVerification": null,
+    "formIsUnverified": true
+  }
+}
+
+## Fighter B — Adam Azim
+{
+  "capturedAt": "2026-06-29T22:57:42+00:00",
+  "version": 1,
+  "record": {
+    "wins": 15,
+    "losses": 0,
+    "draws": 0,
+    "winsKo": 12,
+    "winsDec": 3,
+    "noContests": 0
+  },
+  "form": {
+    "currentStreak": 5,
+    "streakType": "KO",
+    "last5": [
+      "WKO",
+      "WKO",
+      "WKO",
+      "WKO",
+      "WKO"
+    ],
+    "kosInLastFive": 5,
+    "_unverified": true
+  },
+  "physical": {
+    "age": 23,
+    "dob": "2002-07-21",
+    "heightInches": 71,
+    "reachInches": null,
+    "stance": "Orthodox"
+  },
+  "standing": {
+    "titlesHeld": null,
+    "rankings": {
+      "wbc": null,
+      "wbo": null,
+      "ibf": null,
+      "wba": null
+    }
+  },
+  "_meta": {
+    "name": "Adam Azim",
+    "realName": null,
+    "nationality": null,
+    "weightClasses": [
+      "Light welterweight"
+    ],
+    "hasWikipedia": true,
+    "source": "https://en.wikipedia.org/wiki/Adam_Azim",
+    "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+    "needsVerification": null,
+    "formIsUnverified": true
+  }
+}
+
+## What to cover (a checklist, NOT a running order — arrange it your own way for this fight)
+- A sense of each fighter: record, how they win (KO vs decision), recent outings.
+- The genuinely informative contrasts (a clear experience, finishing-rate, reach
+  or age gap). Skip stats that are missing or marginal.
+- The stylistic questions the numbers raise — what each fighter must do.
+Lead with whatever is most interesting about THIS matchup; vary your structure,
+headings and opening from other previews. No odds, no favourite, no prediction.
+
+Remember: invent nothing; use only the JSON above. Omit anything you don't have
+data for — never mention that a figure is missing. Return the JSON object only.

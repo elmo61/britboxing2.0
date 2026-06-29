@@ -1,0 +1,128 @@
+{
+  "bout": {
+    "fighter_a": "Hamzah Sheeraz",
+    "fighter_b": "Chris Eubank Jr",
+    "fighterAId": "hamzah-sheeraz",
+    "fighterBId": "chris-eubank-jr",
+    "weightClass": "Super Middleweight",
+    "eventDate": null,
+    "announcedAt": null,
+    "headline": "Hamzah Sheeraz vs Chris Eubank Jr",
+    "source": "Sample matchup (illustrative, not an announced fight)",
+    "link": ""
+  },
+  "fighter_a_snapshot": {
+    "capturedAt": "2026-06-29T22:57:46+00:00",
+    "version": 1,
+    "record": {
+      "wins": 23,
+      "losses": 0,
+      "draws": 1,
+      "winsKo": 19,
+      "winsDec": 4,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 2,
+      "streakType": "KO",
+      "last5": [
+        "WKO",
+        "WKO",
+        "DRAW",
+        "WKO",
+        "WKO"
+      ],
+      "kosInLastFive": 4,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 27,
+      "dob": "1999-05-25",
+      "heightInches": 75,
+      "reachInches": 75,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Hamzah Sheeraz",
+      "realName": "Mohammed Hamzah Sheeraz",
+      "nationality": null,
+      "weightClasses": [
+        "Light middleweight",
+        "Middleweight",
+        "Super middleweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Hamzah_Sheeraz",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "fighter_b_snapshot": {
+    "capturedAt": "2026-06-29T22:57:46+00:00",
+    "version": 1,
+    "record": {
+      "wins": 35,
+      "losses": 4,
+      "draws": null,
+      "winsKo": 25,
+      "winsDec": 10,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LDEC",
+        "WDEC",
+        "WKO",
+        "WKO",
+        "LKO"
+      ],
+      "kosInLastFive": 2,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 36,
+      "dob": "1989-09-18",
+      "heightInches": 71,
+      "reachInches": 72,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Chris Eubank Jr",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Middleweight",
+        "Super-middleweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Chris_Eubank_Jr",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "system_prompt": "You are a British boxing journalist writing fight-preview articles for BritBoxing (britboxing.co.uk). Tone: UK broadsheet boxing desk — factual, measured, no hype clichés ('all-action war', 'fireworks'). PURPOSE: help the reader understand the two boxers and how the fight shapes up. This is editorial about the fighters, NOT a betting tip — do not discuss odds, who is the favourite, or give a win/method prediction. WRITE FOR VARIETY — this is important. Every preview must feel written from scratch for THIS fight, not poured into a template. Before writing, find the single most interesting angle this matchup's data suggests — a huge experience gap, two unbeaten punchers, a reach mismatch, a veteran slowing down, a prospect's step up — and build the piece around THAT. Vary your opening every time (never default to 'When a fight involves…'); vary the order you introduce the fighters; vary your section headings and how many sections you use; vary article length to fit how much the data supports. The structure below is a checklist of what to COVER, not a running order to follow. Two previews placed side by side should read as clearly different pieces. EMPHASIS: where one fighter is far more famous, weight the piece toward the lesser-known opponent — readers arrive knowing the big name. Where both are comparably known, treat them evenly. DATA DISCIPLINE: use ONLY the statistics provided in the prompt. Never invent records, rankings, dates, venues, quotes or biographical detail. If a stat is null/unknown, simply leave it out — never state that a figure is missing or unavailable. Use a stat only when it is genuinely informative (e.g. a clear reach or experience advantage); skip differences that are marginal. Form data marked unverified may be described softly ('recent outings suggest') or omitted. Do not refer to yourself, to AI, or to how the article was produced. HOUSE STYLE — write like a person, not a model. Hard rules: NEVER use an em dash (—) or en dash (–); use commas, full stops or brackets and recast the sentence. Use straight quotes and apostrophes, not curly ones. Avoid these tell-tale constructions: 'not just X but Y' and 'it's not X, it's Y'; 'not a … so much as …'; semicolon antithesis ('one has X; the other has Y'); rule-of-three lists for rhythm; and ending on a rhetorical 'the question is whether…'. Vary how each article closes. Avoid filler/marketing words (testament, stark reminder, delve, tapestry, landscape, realm, navigate, underscore, boasts, showcase, leverage, crucial, pivotal, robust) and hedging openers (That said, Ultimately, It's worth noting, When it comes to, In a world where). Vary sentence length; let some sentences be short and plain. Return ONLY a JSON object with keys: title, slug, body, summary, tags. 'body' is HTML (<p>, <h2>, <ul>) — no <html>/<head>. 'tags' is an array of strings.",
+  "user_prompt": "Write a fight-preview article for the following bout.\n\n## Bout\n- Matchup: Hamzah Sheeraz vs Chris Eubank Jr\n- Announced via: Sample matchup (illustrative, not an announced fight) — headline: \"Hamzah Sheeraz vs Chris Eubank Jr\"\n- Source link: \n- Event date: to be confirmed\n- Weight class (heaviest division both fighters share): Super Middleweight\n\n## Fighter A — Hamzah Sheeraz\n{\n  \"capturedAt\": \"2026-06-29T22:57:46+00:00\",\n  \"version\": 1,\n  \"record\": {\n    \"wins\": 23,\n    \"losses\": 0,\n    \"draws\": 1,\n    \"winsKo\": 19,\n    \"winsDec\": 4,\n    \"noContests\": null\n  },\n  \"form\": {\n    \"currentStreak\": 2,\n    \"streakType\": \"KO\",\n    \"last5\": [\n      \"WKO\",\n      \"WKO\",\n      \"DRAW\",\n      \"WKO\",\n      \"WKO\"\n    ],\n    \"kosInLastFive\": 4,\n    \"_unverified\": true\n  },\n  \"physical\": {\n    \"age\": 27,\n    \"dob\": \"1999-05-25\",\n    \"heightInches\": 75,\n    \"reachInches\": 75,\n    \"stance\": \"Orthodox\"\n  },\n  \"standing\": {\n    \"titlesHeld\": null,\n    \"rankings\": {\n      \"wbc\": null,\n      \"wbo\": null,\n      \"ibf\": null,\n      \"wba\": null\n    }\n  },\n  \"_meta\": {\n    \"name\": \"Hamzah Sheeraz\",\n    \"realName\": \"Mohammed Hamzah Sheeraz\",\n    \"nationality\": null,\n    \"weightClasses\": [\n      \"Light middleweight\",\n      \"Middleweight\",\n      \"Super middleweight\"\n    ],\n    \"hasWikipedia\": true,\n    \"source\": \"https://en.wikipedia.org/wiki/Hamzah_Sheeraz\",\n    \"license\": \"Text CC BY-SA 4.0 — attribute Wikipedia on display.\",\n    \"needsVerification\": null,\n    \"formIsUnverified\": true\n  }\n}\n\n## Fighter B — Chris Eubank Jr\n{\n  \"capturedAt\": \"2026-06-29T22:57:46+00:00\",\n  \"version\": 1,\n  \"record\": {\n    \"wins\": 35,\n    \"losses\": 4,\n    \"draws\": null,\n    \"winsKo\": 25,\n    \"winsDec\": 10,\n    \"noContests\": null\n  },\n  \"form\": {\n    \"currentStreak\": 0,\n    \"streakType\": null,\n    \"last5\": [\n      \"LDEC\",\n      \"WDEC\",\n      \"WKO\",\n      \"WKO\",\n      \"LKO\"\n    ],\n    \"kosInLastFive\": 2,\n    \"_unverified\": true\n  },\n  \"physical\": {\n    \"age\": 36,\n    \"dob\": \"1989-09-18\",\n    \"heightInches\": 71,\n    \"reachInches\": 72,\n    \"stance\": \"Orthodox\"\n  },\n  \"standing\": {\n    \"titlesHeld\": null,\n    \"rankings\": {\n      \"wbc\": null,\n      \"wbo\": null,\n      \"ibf\": null,\n      \"wba\": null\n    }\n  },\n  \"_meta\": {\n    \"name\": \"Chris Eubank Jr\",\n    \"realName\": null,\n    \"nationality\": null,\n    \"weightClasses\": [\n      \"Middleweight\",\n      \"Super-middleweight\"\n    ],\n    \"hasWikipedia\": true,\n    \"source\": \"https://en.wikipedia.org/wiki/Chris_Eubank_Jr\",\n    \"license\": \"Text CC BY-SA 4.0 — attribute Wikipedia on display.\",\n    \"needsVerification\": null,\n    \"formIsUnverified\": true\n  }\n}\n\n## What to cover (a checklist, NOT a running order — arrange it your own way for this fight)\n- A sense of each fighter: record, how they win (KO vs decision), recent outings.\n- The genuinely informative contrasts (a clear experience, finishing-rate, reach\n  or age gap). Skip stats that are missing or marginal.\n- The stylistic questions the numbers raise — what each fighter must do.\nLead with whatever is most interesting about THIS matchup; vary your structure,\nheadings and opening from other previews. No odds, no favourite, no prediction.\n\nRemember: invent nothing; use only the JSON above. Omit anything you don't have\ndata for — never mention that a figure is missing. Return the JSON object only.\n",
+  "model": "claude-sonnet-4-6"
+}

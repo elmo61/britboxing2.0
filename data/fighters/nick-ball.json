@@ -1,0 +1,65 @@
+{
+  "id": "nick-ball",
+  "name": "Nick Ball",
+  "dob": "1997-02-28",
+  "wikipediaTitle": "Nick_Ball_(boxer)",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:43+00:00",
+    "version": 1,
+    "record": {
+      "wins": 23,
+      "losses": 1,
+      "draws": 1,
+      "winsKo": 13,
+      "winsDec": 10,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LKO",
+        "WDEC",
+        "WDEC",
+        "WKO",
+        "WDEC"
+      ],
+      "kosInLastFive": 1,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 29,
+      "dob": "1997-02-28",
+      "heightInches": 62,
+      "reachInches": 65,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Nick Ball",
+      "realName": null,
+      "nationality": "British",
+      "weightClasses": [
+        "Featherweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Nick_Ball_(boxer)",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "nick-ball-vs-leigh-wood"
+  ],
+  "updatedAt": "2026-06-29T22:57:44+00:00"
+}

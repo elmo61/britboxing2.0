@@ -1,0 +1,65 @@
+{
+  "id": "anthony-yarde",
+  "name": "Anthony Yarde",
+  "dob": "1991-08-13",
+  "wikipediaTitle": "Anthony_Yarde",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:41+00:00",
+    "version": 1,
+    "record": {
+      "wins": 27,
+      "losses": 4,
+      "draws": null,
+      "winsKo": 24,
+      "winsDec": 3,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LKO",
+        "WDEC",
+        "WDEC",
+        "WKO",
+        "WKO"
+      ],
+      "kosInLastFive": 2,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 34,
+      "dob": "1991-08-13",
+      "heightInches": 72,
+      "reachInches": 72,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Anthony Yarde",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Light-heavyweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Anthony_Yarde",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "joshua-buatsi-vs-anthony-yarde"
+  ],
+  "updatedAt": "2026-06-29T22:57:41+00:00"
+}

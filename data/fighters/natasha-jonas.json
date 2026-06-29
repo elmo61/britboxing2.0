@@ -1,0 +1,67 @@
+{
+  "id": "natasha-jonas",
+  "name": "Natasha Jonas",
+  "dob": "1984-06-18",
+  "wikipediaTitle": "Natasha_Jonas",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:45+00:00",
+    "version": 1,
+    "record": {
+      "wins": 16,
+      "losses": 3,
+      "draws": 1,
+      "winsKo": 9,
+      "winsDec": 7,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LDEC",
+        "WDEC",
+        "WDEC",
+        "WKO",
+        "WDEC"
+      ],
+      "kosInLastFive": 1,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 42,
+      "dob": "1984-06-18",
+      "heightInches": 68,
+      "reachInches": null,
+      "stance": "Southpaw"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Natasha Jonas",
+      "realName": "Natasha Jonas",
+      "nationality": null,
+      "weightClasses": [
+        "Super-featherweight",
+        "Lightweight",
+        "Light-middleweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Natasha_Jonas",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "chantelle-cameron-vs-natasha-jonas"
+  ],
+  "updatedAt": "2026-06-29T22:57:45+00:00"
+}

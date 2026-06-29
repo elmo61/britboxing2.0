@@ -1,0 +1,65 @@
+{
+  "id": "moses-itauma",
+  "name": "Moses Itauma",
+  "dob": "2004-12-28",
+  "wikipediaTitle": "Moses_Itauma",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:38+00:00",
+    "version": 1,
+    "record": {
+      "wins": 14,
+      "losses": null,
+      "draws": null,
+      "winsKo": 12,
+      "winsDec": 2,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 5,
+      "streakType": "KO",
+      "last5": [
+        "WKO",
+        "WKO",
+        "WKO",
+        "WKO",
+        "WKO"
+      ],
+      "kosInLastFive": 5,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 21,
+      "dob": "2004-12-28",
+      "heightInches": 76,
+      "reachInches": 79,
+      "stance": "Southpaw"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Moses Itauma",
+      "realName": "Enriko Itauma",
+      "nationality": null,
+      "weightClasses": [
+        "Heavyweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Moses_Itauma",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "moses-itauma-vs-fabio-wardley"
+  ],
+  "updatedAt": "2026-06-29T22:57:38+00:00"
+}

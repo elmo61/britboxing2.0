@@ -1,0 +1,65 @@
+{
+  "id": "fabio-wardley",
+  "name": "Fabio Wardley",
+  "dob": "1994-12-18",
+  "wikipediaTitle": "Fabio_Wardley",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:38+00:00",
+    "version": 1,
+    "record": {
+      "wins": 20,
+      "losses": 1,
+      "draws": 1,
+      "winsKo": 19,
+      "winsDec": 1,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LKO",
+        "WKO",
+        "WKO",
+        "WKO",
+        "DRAW"
+      ],
+      "kosInLastFive": 3,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 31,
+      "dob": "1994-12-18",
+      "heightInches": 77,
+      "reachInches": 78,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Fabio Wardley",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Heavyweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Fabio_Wardley",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "moses-itauma-vs-fabio-wardley"
+  ],
+  "updatedAt": "2026-06-29T22:57:38+00:00"
+}

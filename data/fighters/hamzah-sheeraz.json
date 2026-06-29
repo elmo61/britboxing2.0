@@ -1,0 +1,67 @@
+{
+  "id": "hamzah-sheeraz",
+  "name": "Hamzah Sheeraz",
+  "dob": "1999-05-25",
+  "wikipediaTitle": "Hamzah_Sheeraz",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:46+00:00",
+    "version": 1,
+    "record": {
+      "wins": 23,
+      "losses": 0,
+      "draws": 1,
+      "winsKo": 19,
+      "winsDec": 4,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 2,
+      "streakType": "KO",
+      "last5": [
+        "WKO",
+        "WKO",
+        "DRAW",
+        "WKO",
+        "WKO"
+      ],
+      "kosInLastFive": 4,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 27,
+      "dob": "1999-05-25",
+      "heightInches": 75,
+      "reachInches": 75,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Hamzah Sheeraz",
+      "realName": "Mohammed Hamzah Sheeraz",
+      "nationality": null,
+      "weightClasses": [
+        "Light middleweight",
+        "Middleweight",
+        "Super middleweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Hamzah_Sheeraz",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "hamzah-sheeraz-vs-chris-eubank-jr"
+  ],
+  "updatedAt": "2026-06-29T22:57:46+00:00"
+}

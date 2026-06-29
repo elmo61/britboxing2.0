@@ -1,0 +1,65 @@
+{
+  "id": "chris-billam-smith",
+  "name": "Chris Billam-Smith",
+  "dob": "1990-08-02",
+  "wikipediaTitle": "Chris_Billam-Smith",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:40+00:00",
+    "version": 1,
+    "record": {
+      "wins": 22,
+      "losses": 2,
+      "draws": null,
+      "winsKo": 14,
+      "winsDec": 8,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 2,
+      "streakType": "Decision",
+      "last5": [
+        "WDEC",
+        "WDEC",
+        "LDEC",
+        "WDEC",
+        "WDEC"
+      ],
+      "kosInLastFive": 0,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 35,
+      "dob": "1990-08-02",
+      "heightInches": 75,
+      "reachInches": 76,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Chris Billam-Smith",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Cruiserweight (boxing)"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Chris_Billam-Smith",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "richard-riakporhe-vs-chris-billam-smith"
+  ],
+  "updatedAt": "2026-06-29T22:57:40+00:00"
+}

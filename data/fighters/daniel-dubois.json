@@ -1,0 +1,65 @@
+{
+  "id": "daniel-dubois",
+  "name": "Daniel Dubois",
+  "dob": "1997-09-06",
+  "wikipediaTitle": "Daniel_Dubois",
+  "hasWikipedia": true,
+  "latest": {
+    "capturedAt": "2026-06-29T22:57:37+00:00",
+    "version": 1,
+    "record": {
+      "wins": 23,
+      "losses": 3,
+      "draws": null,
+      "winsKo": 22,
+      "winsDec": 1,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 1,
+      "streakType": "KO",
+      "last5": [
+        "WKO",
+        "LKO",
+        "WKO",
+        "WKO",
+        "WKO"
+      ],
+      "kosInLastFive": 4,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 28,
+      "dob": "1997-09-06",
+      "heightInches": 77,
+      "reachInches": 78,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Daniel Dubois",
+      "realName": null,
+      "nationality": null,
+      "weightClasses": [
+        "Heavyweight"
+      ],
+      "hasWikipedia": true,
+      "source": "https://en.wikipedia.org/wiki/Daniel_Dubois",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "anthony-joshua-vs-daniel-dubois"
+  ],
+  "updatedAt": "2026-06-29T22:57:37+00:00"
+}
