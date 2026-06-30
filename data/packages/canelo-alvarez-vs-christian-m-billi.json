@@ -6,7 +6,11 @@
     "headline": "Report: Canelo's title bout vs. Mbilli pushed to Oct.",
     "source": "ESPN",
     "link": "https://www.espn.com/boxing/story/_/id/49202519/report-alvarez-title-bout-vs-mbilli-pushed-late-october",
-    "published": "Sun, 28 Jun 2026 10:18:20 EST"
+    "published": "Sun, 28 Jun 2026 10:18:20 EST",
+    "fighterAId": "canelo-alvarez",
+    "fighterBId": "christian-m-billi",
+    "eventDate": null,
+    "announcedAt": "Sun, 28 Jun 2026 10:18:20 EST"
   },
   "fighter_a_snapshot": {
     "capturedAt": "2026-06-29T22:19:07+00:00",

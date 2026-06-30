@@ -1,0 +1,67 @@
+{
+  "id": "canelo-alvarez",
+  "name": "Canelo Álvarez",
+  "dob": null,
+  "wikipediaTitle": null,
+  "hasWikipedia": false,
+  "latest": {
+    "capturedAt": "2026-06-29T22:19:07+00:00",
+    "version": 1,
+    "record": {
+      "wins": 63,
+      "losses": 3,
+      "draws": 2,
+      "winsKo": 39,
+      "winsDec": 24,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "LDEC",
+        "WDEC",
+        "WDEC",
+        "WDEC",
+        "WDEC"
+      ],
+      "kosInLastFive": 0,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 35,
+      "heightInches": 68,
+      "reachInches": 70,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Canelo Álvarez",
+      "realName": "{{nowrap|Santos Saúl Álvarez Barragán}}",
+      "nationality": null,
+      "weightClasses": [
+        "Welterweight",
+        "Light middleweight",
+        "Middleweight",
+        "Super middleweight",
+        "Light heavyweight"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Canelo_Álvarez",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "canelo-alvarez-vs-christian-m-billi"
+  ],
+  "updatedAt": "2026-06-30T12:58:39+00:00"
+}

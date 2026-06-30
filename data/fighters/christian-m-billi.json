@@ -1,0 +1,64 @@
+{
+  "id": "christian-m-billi",
+  "name": "Christian M'billi",
+  "dob": null,
+  "wikipediaTitle": null,
+  "hasWikipedia": false,
+  "latest": {
+    "capturedAt": "2026-06-29T22:19:08+00:00",
+    "version": 1,
+    "record": {
+      "wins": 29,
+      "losses": null,
+      "draws": 1,
+      "winsKo": 24,
+      "winsDec": 5,
+      "noContests": null
+    },
+    "form": {
+      "currentStreak": 0,
+      "streakType": null,
+      "last5": [
+        "DRAW",
+        "WKO",
+        "WDEC",
+        "WKO",
+        "WDEC"
+      ],
+      "kosInLastFive": 2,
+      "_unverified": true
+    },
+    "physical": {
+      "age": 31,
+      "heightInches": 68,
+      "reachInches": 72,
+      "stance": "Orthodox"
+    },
+    "standing": {
+      "titlesHeld": null,
+      "rankings": {
+        "wbc": null,
+        "wbo": null,
+        "ibf": null,
+        "wba": null
+      }
+    },
+    "_meta": {
+      "name": "Christian M'billi",
+      "realName": "Christian Mbilli Assomo-Hallier",
+      "nationality": null,
+      "weightClasses": [
+        "Middleweight",
+        "Super middleweight"
+      ],
+      "source": "https://en.wikipedia.org/wiki/Christian_M'billi",
+      "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
+      "needsVerification": null,
+      "formIsUnverified": true
+    }
+  },
+  "bouts": [
+    "canelo-alvarez-vs-christian-m-billi"
+  ],
+  "updatedAt": "2026-06-30T12:58:39+00:00"
+}
