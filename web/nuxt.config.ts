@@ -1,17 +1,14 @@
-import { fileURLToPath } from 'node:url'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
 
-  // Server-only config. `dataDir` points at the JSON "database" in ../data.
-  // Resolved here (at config load) to an absolute path so the Nitro API routes
-  // can read it in dev and during `nuxt generate`. When the real C# API exists,
-  // the /api/fights routes get pointed at it instead.
+  // Server-only config. The Nitro API routes read from Supabase using these
+  // (the browser-safe publishable pair); values come from web/.env (gitignored).
   runtimeConfig: {
-    dataDir: fileURLToPath(new URL('../data', import.meta.url)),
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_KEY,
   },
 
   // For static generation later: crawl the index and prerender every fight page.
