@@ -17,6 +17,11 @@ Commands
   python pipeline.py discover        # poll feeds, process the first NEW valid bout
   python pipeline.py samples [--force]  # rebuild the illustrative sample matchups
   python pipeline.py lint            # flag "AI tell" patterns across all articles
+  python pipeline.py push            # bulk-sync data/ to Supabase
+
+discover/samples also write through to Supabase per-bout when SUPABASE_SECRET_KEY
+is configured (see pipeline/supabase_db.py). The JSON in data/ stays the source
+of truth either way.
 """
 
 from __future__ import annotations
@@ -31,6 +36,7 @@ import feeds
 import fighters
 import snapshots
 import style_check
+import supabase_db
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT.parent / "data"
@@ -72,6 +78,13 @@ def _commit(snap_a: dict, snap_b: dict, *, headline: str, source: str,
     fighters.upsert(DATA_DIR, snap_a, slug)
     fighters.upsert(DATA_DIR, snap_b, slug)
     _maybe_generate(slug, bout, snap_a, snap_b)
+    # Write through to the database when configured (JSON stays source of truth).
+    if supabase_db.enabled():
+        try:
+            supabase_db.push_slug(DATA_DIR, slug)
+            print("  -> synced to Supabase")
+        except Exception as e:
+            print(f"  ! Supabase write failed (JSON saved): {e}")
     return slug, True
 
 
@@ -163,6 +176,17 @@ def lint() -> int:
     return 1 if hard_total else 0
 
 
+def push() -> int:
+    """Bulk-sync everything in data/ to Supabase."""
+    if not supabase_db.enabled():
+        print("SUPABASE_SECRET_KEY not set — add it to a .env to enable DB writes.")
+        return 1
+    counts = supabase_db.push_all(DATA_DIR)
+    print(f"Synced to Supabase: {counts['fighters']} fighters, "
+          f"{counts['bouts']} bouts, {counts['articles']} articles.")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     cmd = argv[1] if len(argv) > 1 else "discover"
     if cmd == "discover":
@@ -171,6 +195,8 @@ def main(argv: list[str]) -> int:
         return samples(force="--force" in argv or True)
     if cmd == "lint":
         return lint()
+    if cmd == "push":
+        return push()
     print(__doc__)
     return 1
 

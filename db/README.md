@@ -56,9 +56,11 @@ docker exec -it bb_pg psql -U postgres        # poke around
 docker rm -f bb_pg                            # tear down
 ```
 
-## Not done yet (next step)
+## How it connects
 
-The Nuxt site still reads the JSON files via its Nitro API. Pointing it at
-Supabase is a follow-up: add the Supabase client + connection env vars and swap
-the `web/server/api/*` handlers to query Postgres instead of reading `../data`.
-The Vue pages don't change — they only call `/api/*`.
+- **Site reads** from Supabase: the Nuxt Nitro API (`web/server/`) queries
+  Postgres with the publishable key (read-only RLS via `policies.sql`).
+- **Pipeline writes** to Supabase: `pipeline/supabase_db.py` upserts with the
+  secret key (`python pipeline.py push`, or write-through on discover/samples).
+- The JSON in `../data` remains the source of truth; `seed.sql` / `push` are two
+  ways to load it into the DB.

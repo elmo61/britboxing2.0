@@ -40,7 +40,23 @@ pip install requests mwparserfromhell feedparser anthropic
 python pipeline.py discover     # poll feeds, snapshot first VALID bout, build prompt
 python pipeline.py samples      # snapshot every pair in sample_matchups.json
 python pipeline.py lint         # flag AI-tell patterns across all articles
+python pipeline.py push         # bulk-sync data/ to Supabase
 ```
+
+## Writing to Supabase
+
+`supabase_db.py` upserts fighters/bouts/articles into Postgres via the REST API.
+Writes bypass the public read-only RLS, so they use the **secret** key — set it
+in a gitignored `.env` at the repo root (never commit it):
+
+```
+SUPABASE_URL=https://<ref>.supabase.co
+SUPABASE_SECRET_KEY=sb_secret_...      # Supabase -> Project Settings -> API -> secret key
+```
+
+With that set, `discover`/`samples` write each new bout through to the DB
+automatically; `push` re-syncs everything. Without it, db writes are skipped and
+the JSON in `data/` is still written (it remains the source of truth).
 
 `discover` accepts a bout **only if one is actually in the feeds**, and only when
 *both* names resolve to real Wikipedia boxer articles with a parseable record
