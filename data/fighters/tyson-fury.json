@@ -1,38 +1,38 @@
 {
-  "id": "anthony-joshua",
-  "name": "Anthony Joshua",
-  "dob": "1989-10-15",
-  "wikipediaTitle": "Anthony_Joshua",
+  "id": "tyson-fury",
+  "name": "Tyson Fury",
+  "dob": "1988-08-12",
+  "wikipediaTitle": "Tyson_Fury",
   "hasWikipedia": true,
   "latest": {
-    "capturedAt": "2026-06-30T13:54:57+00:00",
+    "capturedAt": "2026-06-30T13:54:56+00:00",
     "version": 1,
     "record": {
-      "wins": 29,
-      "losses": 4,
-      "draws": null,
-      "winsKo": 26,
-      "winsDec": 3,
+      "wins": 35,
+      "losses": 2,
+      "draws": 1,
+      "winsKo": 24,
+      "winsDec": 11,
       "noContests": null
     },
     "form": {
       "currentStreak": 1,
-      "streakType": "KO",
+      "streakType": "Decision",
       "last5": [
-        "WKO",
-        "LKO",
-        "WKO",
+        "WDEC",
+        "LDEC",
+        "LDEC",
         "WDEC",
         "WKO"
       ],
-      "kosInLastFive": 3,
+      "kosInLastFive": 1,
       "_unverified": true
     },
     "physical": {
-      "age": 36,
-      "dob": "1989-10-15",
-      "heightInches": 78,
-      "reachInches": 82,
+      "age": 37,
+      "dob": "1988-08-12",
+      "heightInches": 81,
+      "reachInches": 85,
       "stance": "Orthodox"
     },
     "standing": {
@@ -45,21 +45,20 @@
       }
     },
     "_meta": {
-      "name": "Anthony Joshua",
-      "realName": "Anthony Oluwafemi Olaseni Joshua",
+      "name": "Tyson Fury",
+      "realName": "Tyson Luke Fury",
       "nationality": null,
       "weightClasses": [
         "Heavyweight"
       ],
       "hasWikipedia": true,
-      "source": "https://en.wikipedia.org/wiki/Anthony_Joshua",
+      "source": "https://en.wikipedia.org/wiki/Tyson_Fury",
       "license": "Text CC BY-SA 4.0 — attribute Wikipedia on display.",
       "needsVerification": null,
       "formIsUnverified": true
     }
   },
   "bouts": [
-    "anthony-joshua-vs-daniel-dubois",
     "tyson-fury-vs-anthony-joshua"
   ],
   "updatedAt": "2026-06-30T13:54:57+00:00"
