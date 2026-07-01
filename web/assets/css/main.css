@@ -116,3 +116,16 @@ footer.attribution a { color: var(--muted); }
   letter-spacing: .04em; color: var(--red); font-size: .92rem; margin-bottom: 8px;
 }
 .card p { color: var(--muted); font-size: .92rem; margin: 0; }
+.card .posted {
+  font-family: var(--font-cond); font-weight: 500; font-size: .72rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  margin-top: 12px;
+}
+
+/* posted / fight-date meta line on the article page */
+.meta-dates {
+  font-family: var(--font-cond); font-weight: 500; font-size: .8rem;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  margin: 2px 0 10px;
+}
+.meta-dates strong { color: var(--gold); font-weight: 600; }

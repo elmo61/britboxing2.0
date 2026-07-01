@@ -32,6 +32,11 @@ useHead(() => ({
     <div class="masthead"><BritLogo /></div>
     <div class="kicker">Fight preview<template v-if="f.bout.weightClass"> · {{ f.bout.weightClass }}</template></div>
     <h1>{{ f.article.title }}</h1>
+    <div class="meta-dates">
+      <template v-if="formatEventDate(f.bout.eventDate)">Fight date <strong>{{ formatEventDate(f.bout.eventDate) }}</strong></template>
+      <template v-if="formatEventDate(f.bout.eventDate) && formatPostedAt(f.article.published_at)"> · </template>
+      <template v-if="formatPostedAt(f.article.published_at)">Posted {{ formatPostedAt(f.article.published_at) }}</template>
+    </div>
     <p class="summary">{{ f.article.summary }}</p>
     <div class="announce">
       Announced via {{ f.bout.source }}: &ldquo;{{ f.bout.headline }}&rdquo;

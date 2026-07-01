@@ -26,10 +26,13 @@ useHead({
         class="card"
         :to="`/fights/${f.slug}`"
       >
-        <div class="kicker">{{ f.division }}</div>
+        <div class="kicker">
+          {{ f.division }}<template v-if="f.division && formatEventDate(f.eventDate)"> · </template><template v-if="formatEventDate(f.eventDate)">{{ formatEventDate(f.eventDate) }}</template>
+        </div>
         <h2>{{ f.title }}</h2>
         <div class="matchup">{{ f.matchup }}</div>
         <p>{{ f.summary }}</p>
+        <div v-if="formatPostedAt(f.postedAt)" class="posted">Posted {{ formatPostedAt(f.postedAt) }}</div>
       </NuxtLink>
     </div>
   </div>
