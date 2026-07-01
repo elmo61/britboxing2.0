@@ -131,7 +131,7 @@ const b = computed(() => toCol(props.fighterB))
   display: inline-block; font-size: .58rem; color: var(--gold); letter-spacing: .04em;
   border: 1px solid var(--gold); border-radius: 3px; padding: 0 4px; margin-left: 6px;
 }
-.pills { display: flex; gap: 4px; }
+.pills { display: flex; gap: 4px; flex-wrap: wrap; min-width: 0; }
 .pills.l { justify-content: flex-end; padding-right: 18px; }
 .pills.r { justify-content: flex-start; padding-left: 18px; }
 .pill { font-family: var(--font-cond); font-size: .64rem; font-weight: 600; padding: 2px 6px; color: #fff; }
@@ -140,4 +140,18 @@ const b = computed(() => toCol(props.fighterB))
 .pill.d { background: var(--draw); }
 .pill.n { background: #444; }
 .muted { color: var(--muted); }
+
+/* narrow screens: tighter tape so the last-5 pills never force the page wide */
+@media (max-width: 560px) {
+  .bill { padding: 20px 12px 22px; }
+  .fname { font-size: 1.45rem; }
+  .rec { font-size: .92rem; }
+  .v { font-size: .95rem; }
+  .v.l { padding-right: 10px; }
+  .v.r { padding-left: 10px; }
+  .lab { font-size: .58rem; letter-spacing: .12em; }
+  .pills.l { padding-right: 8px; }
+  .pills.r { padding-left: 8px; }
+  .pill { font-size: .56rem; padding: 2px 4px; }
+}
 </style>
