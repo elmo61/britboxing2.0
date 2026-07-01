@@ -69,14 +69,32 @@ create index if not exists idx_bouts_fighter_b on bouts(fighter_b_id);
 create index if not exists idx_fighters_weight  on fighters using gin (weight_classes);
 
 -- Pipeline-internal: lets the feed job skip re-running AI extraction on RSS
--- items it has already processed in a prior run. Never read by the site.
+-- items it has already processed in a prior run, and tracks each item through
+-- the decide -> bout -> article stages. Never read by the site.
 create table if not exists seen_feed_items (
     item_key      text primary key,   -- source_url, or sha256(source|headline) when a source has no URL
     source        text not null,
     headline      text,
     source_url    text,
     published_at  timestamptz,        -- the feed's own pubDate, null if the source didn't supply one
-    first_seen_at timestamptz not null default now()
+    first_seen_at timestamptz not null default now(),
+    -- Processing state:
+    --   new             collected + extracted, not yet decided on
+    --   ignored         decided against (see ignore_reason)
+    --   bout_created    bouts row exists (bout_slug set) but article failed/pending
+    --   article_created bout + article both written
+    status        text not null default 'new',
+    ignore_reason text,
+    extracted     jsonb,              -- the extractor's output, kept so processing can resume across runs
+    bout_slug     text references bouts(slug)
 );
 
+-- Idempotent upgrade for databases created before the status columns existed
+-- (must run before the status index below references the column).
+alter table seen_feed_items add column if not exists status        text not null default 'new';
+alter table seen_feed_items add column if not exists ignore_reason text;
+alter table seen_feed_items add column if not exists extracted     jsonb;
+alter table seen_feed_items add column if not exists bout_slug     text references bouts(slug);
+
 create index if not exists idx_seen_feed_items_first_seen on seen_feed_items(first_seen_at);
+create index if not exists idx_seen_feed_items_status     on seen_feed_items(status);

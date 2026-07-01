@@ -1,7 +1,13 @@
 using System.Text.Json;
 using BritBoxingFeeds.Core;
+using BritBoxingFeeds.Core.Articles;
+using BritBoxingFeeds.Core.Deploy;
+using BritBoxingFeeds.Core.Enrichment;
+using BritBoxingFeeds.Core.Fighters;
 using BritBoxingFeeds.Core.Interfaces;
+using BritBoxingFeeds.Core.Processing;
 using BritBoxingFeeds.Core.State;
+using BritBoxingFeeds.Core.Supabase;
 using BritBoxingFeeds.Deduplication;
 using BritBoxingFeeds.Extraction;
 using BritBoxingFeeds.Sources;
@@ -60,6 +66,14 @@ services.AddTransient<RegexFightDataExtractor>();
 services.AddHttpClient<AnthropicFightDataExtractor>();
 services.AddTransient<CompositeFightDataExtractor>();
 services.AddHttpClient<SeenFeedItemsStore>();
+
+// The decide → bout → article stage.
+services.AddHttpClient<SupabaseClient>();
+services.AddHttpClient<WikipediaSnapshotService>();
+services.AddHttpClient<ArticleGenerator>();
+services.AddTransient<FighterStore>();
+services.AddTransient<BoutProcessor>();
+services.AddHttpClient<SiteDeployTrigger>();
 
 services.AddSingleton<IFightDeduplicator>(_ => new FightDeduplicator());
 
@@ -130,6 +144,32 @@ var deduped = await deduplicator.DeduplicateAsync(enriched);
 // recorded under their URL/headline key, so they aren't reprocessed either.
 await seenStore.MarkSeenAsync(enriched);
 
+// Decide → bout → article. Candidates are this run's deduped fights plus
+// any status=new fight rows left over from earlier runs (resumed from
+// their stored extraction), deduped against each other by fight key.
+var pending = await seenStore.LoadPendingAsync();
+var thisRunKeys = deduped
+    .SelectMany(SeenFeedItemsStore.ComputeKeys)
+    .Where(k => k.StartsWith("fight:"))
+    .ToHashSet();
+var resumed = pending
+    .Where(p => !thisRunKeys.Contains(p.ItemKey))
+    .ToList();
+
+var processor = provider.GetRequiredService<BoutProcessor>();
+var summary = await processor.ProcessAsync([
+    .. deduped.Select(d => (d, (string?)null)),
+    .. resumed.Select(p => (p.Item, (string?)p.ItemKey)),
+]);
+var recoveredArticles = await processor.RetryMissingArticlesAsync();
+
+// The site is statically generated — a rebuild is what actually publishes
+// new content, so trigger one only when this run created something.
+if (summary.BoutsCreated + summary.ArticlesCreated + recoveredArticles > 0)
+{
+    await provider.GetRequiredService<SiteDeployTrigger>().TriggerAsync();
+}
+
 var ordered = deduped.OrderByDescending(r => r.RetrievedAt).ToList();
 
 if (jsonMode)
@@ -154,7 +194,12 @@ Console.WriteLine(
     $"Collected {results.Count} items " +
     $"({results.Count - dateFiltered.Count} older than last run, " +
     $"{dateFiltered.Count - candidates.Count} already seen — skipped), " +
-    $"{enriched.Count} processed, {deduped.Count} after dedup:");
+    $"{enriched.Count} processed, {deduped.Count} after dedup.");
+Console.WriteLine(
+    $"Processing: {summary.Considered} considered ({resumed.Count} resumed from earlier runs), " +
+    $"{summary.Ignored} ignored, {summary.AlreadyExisted} already existed, " +
+    $"{summary.BoutsCreated} bouts created, {summary.ArticlesCreated} articles published, " +
+    $"{recoveredArticles} missing articles recovered.");
 Console.WriteLine();
 
 foreach (var item in ordered)

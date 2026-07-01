@@ -104,7 +104,8 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
                 City = dto.City ?? raw.City,
                 WeightClass = dto.WeightClass ?? raw.WeightClass,
                 TitleOnTheLine = dto.TitleOnTheLine ?? raw.TitleOnTheLine,
-                Broadcaster = dto.Broadcaster ?? raw.Broadcaster
+                Broadcaster = dto.Broadcaster ?? raw.Broadcaster,
+                IsUpcoming = dto.IsUpcoming ?? raw.IsUpcoming
             };
         }
         catch (Exception ex)
@@ -132,7 +133,8 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
           "city": string | null,
           "weightClass": string | null,
           "titleOnTheLine": string | null,  // e.g. "WBC", "IBF", null if not a title fight
-          "broadcaster": string | null      // e.g. "DAZN", "Sky Sports", null if not mentioned
+          "broadcaster": string | null,     // e.g. "DAZN", "Sky Sports", null if not mentioned
+          "isUpcoming": boolean | null      // true = an announced/scheduled fight; false = a report/result of a fight that already happened; null = can't tell
         }
         """);
         sb.AppendLine();

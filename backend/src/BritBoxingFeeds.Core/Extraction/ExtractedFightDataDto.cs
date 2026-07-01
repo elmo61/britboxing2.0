@@ -15,4 +15,5 @@ internal class ExtractedFightDataDto
     public string? WeightClass { get; set; }
     public string? TitleOnTheLine { get; set; }
     public string? Broadcaster { get; set; }
+    public bool? IsUpcoming { get; set; }        // true = announced/scheduled, false = result/report of a past fight, null = can't tell
 }
