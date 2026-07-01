@@ -36,7 +36,8 @@ public abstract class RssFightSourceBase : IFightSource
             RawHeadline = item.Title?.Text ?? "",
             SourceUrl = item.Links.FirstOrDefault()?.Uri?.ToString() ?? "",
             ArticleBody = item.Summary?.Text,
-            RetrievedAt = DateTimeOffset.UtcNow
+            RetrievedAt = DateTimeOffset.UtcNow,
+            PublishedAt = item.PublishDate == default ? null : item.PublishDate
         }).ToList();
     }
 }

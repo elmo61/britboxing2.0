@@ -13,6 +13,9 @@ public record FightAnnouncement
     public required string RawHeadline { get; init; }
     public DateTimeOffset RetrievedAt { get; init; } = DateTimeOffset.UtcNow;
 
+    /// <summary>The feed's own publish date for this item (RSS pubDate/Atom updated), if given. Null, not RetrievedAt's value, means the source didn't supply one.</summary>
+    public DateTimeOffset? PublishedAt { get; init; }
+
     public string? Fighter1 { get; init; }
     public string? Fighter2 { get; init; }
     public DateTimeOffset? EventDate { get; init; }

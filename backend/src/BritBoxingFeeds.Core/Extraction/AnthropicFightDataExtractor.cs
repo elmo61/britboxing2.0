@@ -46,6 +46,9 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
         {
             model = Model,
             max_tokens = 500,
+            // Sonnet 5 defaults to adaptive thinking when this is omitted —
+            // unneeded for a simple field extraction, and it costs output tokens.
+            thinking = new { type = "disabled" },
             messages = new[]
             {
                 new { role = "user", content = prompt }
@@ -65,10 +68,14 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
             var responseJson = await response.Content.ReadAsStringAsync(ct);
             using var doc = JsonDocument.Parse(responseJson);
 
+            // The content array can carry non-text blocks (e.g. thinking, when
+            // enabled) ahead of the answer — take the first text block, not [0].
             var text = doc.RootElement
-                .GetProperty("content")[0]
-                .GetProperty("text")
-                .GetString() ?? "";
+                .GetProperty("content")
+                .EnumerateArray()
+                .Where(b => b.GetProperty("type").GetString() == "text")
+                .Select(b => b.GetProperty("text").GetString())
+                .FirstOrDefault() ?? "";
 
             var cleaned = text.Replace("```json", "").Replace("```", "").Trim();
             var dto = JsonSerializer.Deserialize<ExtractedFightDataDto>(cleaned, new JsonSerializerOptions

@@ -4,10 +4,14 @@
 -- the pipeline writes with a privileged key / direct connection instead.
 -- Idempotent: safe to re-run.
 
-alter table fighters enable row level security;
-alter table bouts    enable row level security;
-alter table articles enable row level security;
-alter table events   enable row level security;
+alter table fighters        enable row level security;
+alter table bouts           enable row level security;
+alter table articles        enable row level security;
+alter table events          enable row level security;
+
+-- Pipeline-internal bookkeeping — no public policy at all (RLS default-denies),
+-- so only the service-role key (which bypasses RLS) can read or write it.
+alter table seen_feed_items enable row level security;
 
 drop policy if exists "public read fighters" on fighters;
 drop policy if exists "public read bouts"    on bouts;

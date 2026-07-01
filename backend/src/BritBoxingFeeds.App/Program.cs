@@ -1,6 +1,7 @@
 using System.Text.Json;
 using BritBoxingFeeds.Core;
 using BritBoxingFeeds.Core.Interfaces;
+using BritBoxingFeeds.Core.State;
 using BritBoxingFeeds.Deduplication;
 using BritBoxingFeeds.Extraction;
 using BritBoxingFeeds.Sources;
@@ -8,6 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 LoadDotEnv();
+
+// How far before the last run an item's own PublishedAt can sit and still
+// count as "new" — covers feeds that backdate items or arrive late.
+var gracePeriod = TimeSpan.FromHours(3);
 
 // --json: print the deduped list as JSON to stdout instead of the human report.
 // --json=<path>: same, but also write the JSON to that file.
@@ -54,13 +59,54 @@ services.AddTransient<FightAggregator>();
 services.AddTransient<RegexFightDataExtractor>();
 services.AddHttpClient<AnthropicFightDataExtractor>();
 services.AddTransient<CompositeFightDataExtractor>();
+services.AddHttpClient<SeenFeedItemsStore>();
 
 services.AddSingleton<IFightDeduplicator>(_ => new FightDeduplicator());
 
 await using var provider = services.BuildServiceProvider();
 
+// Fail fast: without Supabase there's nowhere to persist results or the
+// seen-items dedup table, so there's no point spending time on RSS/LLM work
+// at all. Checked before anything else runs.
+var seenStore = provider.GetRequiredService<SeenFeedItemsStore>();
+if (!await seenStore.CheckConnectionAsync())
+{
+    Console.Error.WriteLine(
+        "Fatal: cannot reach the seen_feed_items table in Supabase. " +
+        "Check SUPABASE_URL / SUPABASE_SECRET_KEY in backend/.env, and that " +
+        "db/schema.sql + db/policies.sql have been applied. Aborting — " +
+        "nothing downstream can be persisted without this.");
+    Environment.Exit(1);
+    return;
+}
+
 var aggregator = provider.GetRequiredService<FightAggregator>();
 var results = await aggregator.CollectAllAsync();
+
+// Skip items already run through extraction in a prior run — the same fight
+// reappearing shouldn't cost another LLM call.
+var seen = await seenStore.LoadRecentAsync(TimeSpan.FromDays(30));
+var cutoff = seen.LastRunAt is { } lastRunAt ? lastRunAt - gracePeriod : (DateTimeOffset?)null;
+
+var dateFiltered = results.Where(item =>
+    cutoff is null || item.PublishedAt is not { } published || published >= cutoff
+).ToList();
+
+// Free regex pass, purely so the seen-check can key on fighter-pair +
+// event month/year rather than just the raw URL — the same fight reported
+// under a different URL is still recognized, without needing the LLM to
+// know that yet. Extraction below reruns its own regex pass on survivors
+// (idempotent, no added cost) and only escalates to the LLM if still incomplete.
+var regexExtractor = provider.GetRequiredService<RegexFightDataExtractor>();
+var candidates = new List<BritBoxingFeeds.Core.Models.FightAnnouncement>();
+foreach (var item in dateFiltered)
+{
+    var regexed = await regexExtractor.ExtractAsync(item);
+    if (!SeenFeedItemsStore.ComputeKeys(regexed).Any(seen.Contains))
+    {
+        candidates.Add(item);
+    }
+}
 
 // Extraction. Use the LLM composite when ANTHROPIC_API_KEY is set, otherwise
 // fall back to the free regex-only pass so the app still runs without a key.
@@ -69,7 +115,7 @@ IFightDataExtractor extractor = Environment.GetEnvironmentVariable("ANTHROPIC_AP
     : provider.GetRequiredService<RegexFightDataExtractor>();
 
 var enriched = new List<BritBoxingFeeds.Core.Models.FightAnnouncement>();
-foreach (var item in results)
+foreach (var item in candidates)
 {
     enriched.Add(await extractor.ExtractAsync(item));
 }
@@ -78,6 +124,11 @@ foreach (var item in results)
 // the same announcement) into single records.
 var deduplicator = provider.GetRequiredService<IFightDeduplicator>();
 var deduped = await deduplicator.DeduplicateAsync(enriched);
+
+// Record every item just processed as seen, using its final (post-LLM where
+// applicable) fields — noise items that never resolved to a fight are still
+// recorded under their URL/headline key, so they aren't reprocessed either.
+await seenStore.MarkSeenAsync(enriched);
 
 var ordered = deduped.OrderByDescending(r => r.RetrievedAt).ToList();
 
@@ -99,7 +150,11 @@ if (jsonMode)
 }
 
 Console.WriteLine();
-Console.WriteLine($"Collected {enriched.Count} items, {deduped.Count} after dedup:");
+Console.WriteLine(
+    $"Collected {results.Count} items " +
+    $"({results.Count - dateFiltered.Count} older than last run, " +
+    $"{dateFiltered.Count - candidates.Count} already seen — skipped), " +
+    $"{enriched.Count} processed, {deduped.Count} after dedup:");
 Console.WriteLine();
 
 foreach (var item in ordered)

@@ -67,3 +67,16 @@ create table if not exists articles (
 create index if not exists idx_bouts_fighter_a on bouts(fighter_a_id);
 create index if not exists idx_bouts_fighter_b on bouts(fighter_b_id);
 create index if not exists idx_fighters_weight  on fighters using gin (weight_classes);
+
+-- Pipeline-internal: lets the feed job skip re-running AI extraction on RSS
+-- items it has already processed in a prior run. Never read by the site.
+create table if not exists seen_feed_items (
+    item_key      text primary key,   -- source_url, or sha256(source|headline) when a source has no URL
+    source        text not null,
+    headline      text,
+    source_url    text,
+    published_at  timestamptz,        -- the feed's own pubDate, null if the source didn't supply one
+    first_seen_at timestamptz not null default now()
+);
+
+create index if not exists idx_seen_feed_items_first_seen on seen_feed_items(first_seen_at);
