@@ -28,6 +28,10 @@ import feedparser
 FEEDS = {
     "BBC": "https://feeds.bbci.co.uk/sport/boxing/rss.xml",
     "ESPN": "https://www.espn.com/espn/rss/boxing/news",
+    # Boxing-dedicated feeds (idea taken from the C# BritBoxingFeeds example) —
+    # far higher signal for actual fight announcements than general-sport feeds.
+    "BoxingScene": "https://www.boxingscene.com/rss",
+    "WorldBoxingNews": "https://www.worldboxingnews.net/feed/",
     "Sky": "https://www.skysports.com/rss/12040",
 }
 
