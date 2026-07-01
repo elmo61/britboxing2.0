@@ -3,8 +3,10 @@ using BritBoxingFeeds.Core.Models;
 namespace BritBoxingFeeds.Deduplication;
 
 /// <summary>
-/// Merges records that describe the same fight (reported by multiple sources)
-/// into single entries. Takes the full list in, returns the deduped list.
+/// Takes the full collected/extracted set of FightAnnouncements (which will
+/// contain the same real-world fight reported separately by BBC, BoxingScene,
+/// Matchroom etc) and merges duplicates into single records, populating
+/// MergedFromSources/AllSourceUrls on the survivor.
 /// </summary>
 public interface IFightDeduplicator
 {

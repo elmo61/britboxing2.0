@@ -19,7 +19,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-MODEL = "claude-sonnet-4-6"  # per the plan's tech-stack table
+MODEL = "claude-sonnet-5"  # per the plan's tech-stack table
 
 SYSTEM_PROMPT = (
     "You are a British boxing journalist writing fight-preview articles for "

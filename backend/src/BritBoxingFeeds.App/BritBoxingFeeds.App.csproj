@@ -19,9 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BritBoxingFeeds.Core\BritBoxingFeeds.Core.csproj" />
-    <ProjectReference Include="..\BritBoxingFeeds.Sources\BritBoxingFeeds.Sources.csproj" />
-    <ProjectReference Include="..\BritBoxingFeeds.Extraction\BritBoxingFeeds.Extraction.csproj" />
-    <ProjectReference Include="..\BritBoxingFeeds.Deduplication\BritBoxingFeeds.Deduplication.csproj" />
   </ItemGroup>
 
 </Project>
