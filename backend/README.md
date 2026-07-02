@@ -1,45 +1,59 @@
 # BritBoxingFeeds (C#)
 
-The C# backend that pulls upcoming-fight announcements from British boxing news
-feeds, extracts structured fields (fighters / date / venue / weight class), and
-dedupes the same fight reported by multiple sources. Adapted from an example
-solution; being migrated to full parity with (and eventually replacing) the
-Python `pipeline/`.
+The C# backend that runs the whole content pipeline: pulls fight announcements
+from British boxing news feeds, extracts structured fields, dedupes across
+sources, skips already-seen items, verifies fighters against Wikipedia, creates
+bouts with frozen record snapshots, generates the preview articles, writes it
+all to Supabase and triggers a rebuild of the static site. Replaced the
+original Python `pipeline/` (retired 2026-07-02; in git history).
 
 ## Structure
 
 ```
 src/
-  BritBoxingFeeds.Core/          FightAnnouncement model, IFightSource, FightAggregator
-  BritBoxingFeeds.Sources/       one class per feed — RssFightSourceBase + BBC / BoxingScene /
-                                 WorldBoxingNews / YouTube (+ MatchroomSource, not registered:
-                                 promoter scraping is out of scope per ../CLAUDE.md)
-  BritBoxingFeeds.Extraction/    Regex (free) + Anthropic (LLM) + Composite (regex-first) extractors
-  BritBoxingFeeds.Deduplication/ merge the same fight across sources (name-pair + date tolerance)
-  BritBoxingFeeds.App/           console runner (DI wiring)
+  BritBoxingFeeds.Core/            all logic, one library:
+    Models/                        FightAnnouncement
+    Interfaces/ + FightAggregator  IFightSource fan-out
+    Sources/                       RssFightSourceBase + BBC / BoxingScene / WorldBoxingNews /
+                                   YouTube (+ MatchroomSource, not registered: promoter
+                                   scraping is out of scope per ../CLAUDE.md)
+    Extraction/                    Regex (free) + Anthropic (LLM) + Composite (regex-first)
+    Deduplication/                 merge the same fight across sources (name-pair + date tolerance)
+    State/                         SeenFeedItemsStore — skip items processed in prior runs;
+                                   status lifecycle new/ignored/bout_created/article_created
+    Enrichment/                    WikipediaSnapshotService — MediaWiki -> JSONB fighter snapshot
+    Fighters/                      FighterStore — stable slug IDs, fighters table upserts
+    Processing/                    BoutProcessor — decide -> bout -> article orchestration
+    Articles/                      ArticleGenerator — house-style preview via Claude
+    Supabase/                      thin PostgREST client (service-role key)
+    Deploy/                        SiteDeployTrigger — POST the Render deploy hook
+  BritBoxingFeeds.App/             console runner (DI wiring); an API project could sit
+                                   beside it sharing Core
 ```
 
 ## Run
 
-Requires the .NET 8 SDK.
+Requires the .NET 8 SDK and a `backend/.env` (gitignored) with
+`ANTHROPIC_API_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`,
+`RENDER_DEPLOY_HOOK_URL`.
 
 ```bash
 cd backend
-dotnet run --project src/BritBoxingFeeds.App
+dotnet run --project src/BritBoxingFeeds.App             # full pipeline + report
+dotnet run --project src/BritBoxingFeeds.App -- --json   # raw JSON to stdout
 ```
+
+The app fails fast if Supabase is unreachable (nothing downstream could be
+persisted). Without `ANTHROPIC_API_KEY` extraction runs regex-only.
 
 - **`NuGet.config`** pins restore to nuget.org (`<clear/>` drops any inherited
   private/enterprise feeds that would 401 on a personal build).
-- With **`ANTHROPIC_API_KEY`** set, extraction uses the regex-first + LLM
-  composite (fills fighters/date/venue/title from messy headlines + article
-  bodies). Without it, the app runs **regex-only** — clean "X vs Y" headlines
-  resolve, everything else is left blank for a human/LLM pass.
+- In production this runs on a GitHub Actions schedule every 3 hours
+  (`.github/workflows/pipeline.yml`); secrets live in the repo's Actions
+  settings.
 
-## Status / next
+## Known issues
 
-- Builds clean on net8; runs and collects live feeds (confirmed it captures new
-  announcements, e.g. the Fury–Wach fight from BBC).
-- **Not yet ported from Python:** Wikipedia enrichment → fighter snapshots,
-  article generation (house style), and Supabase writes. Those land here next,
-  then the Python `pipeline/` is retired.
-- BoxingScene's `/rss` currently returns nothing (dead feed) — fix the URL or drop it.
+- BoxingScene's `/rss` returns 403 (dead feed) — fix the URL or drop it.
+- The Python `style_check.py` AI-tells lint was not ported; the rules live in
+  the generation prompt but there's no post-generation validation pass yet.

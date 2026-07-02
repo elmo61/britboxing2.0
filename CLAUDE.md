@@ -22,14 +22,15 @@ fighter data actually comes from. Resolved:
 
 - **Primary record source: English Wikipedia (MediaWiki API) + Wikidata.**
   Licensed for reuse — Wikipedia text is CC BY-SA 4.0 (attribute Wikipedia when
-  you display derived text); Wikidata structured data is CC0. A working prototype
-  fetcher already exists: **`britboxing_wikifetch.py`** — it pulls a fighter's
-  record + bio and emits the exact JSONB snapshot shape. Validate data quality
-  with it, then **port the logic into `FighterEnrichmentService.cs`**.
-  - Set a real `USER_AGENT` (Wikimedia API policy requires a descriptive UA with
-    contact info).
-  - The `--records` last-5 derivation is **best-effort / unverified** — Wikipedia
-    bout tables vary in layout. Eyeball it; don't freeze it blind.
+  you display derived text); Wikidata structured data is CC0. **Implemented:**
+  `backend/src/BritBoxingFeeds.Core/Enrichment/WikipediaSnapshotService.cs`
+  fetches a fighter's record + bio and emits the JSONB snapshot shape. (The
+  Python prototype `britboxing_wikifetch.py` it was ported from is retired —
+  recover from git history if ever needed.)
+  - It sets a descriptive User-Agent (Wikimedia API policy) and rejects
+    wrong-article search hits (surname must match; "career of"/list pages refused).
+  - The last-5 form derivation is **best-effort / unverified** — Wikipedia
+    bout tables vary in layout; snapshots carry an `_unverified` flag.
 - **Rankings: the sanctioning bodies (WBC / WBO / IBF / WBA) ratings pages.**
   Public, update ~monthly, so a low-volume monthly read is reasonable. Verify each
   site's `robots.txt` / terms first; prefer a downloadable ratings doc over HTML
@@ -73,8 +74,6 @@ Read these before trusting the plan verbatim.
    news RSS is the announcement trigger; promoter sites aren't scraped.
 
 ## Assets already produced
-- **`britboxing_wikifetch.py`** — Wikipedia record/bio fetcher → snapshot JSON.
-  Prototype to validate, then port to C#.
 - **Seed fighter list** (British, by division — **names only, records UNVERIFIED**;
   confirm each via the fetcher before seeding). Britain is deep heavyweight →
   welterweight and thin below, so a strict "top 10 each" is artificial in the
@@ -101,14 +100,22 @@ Read these before trusting the plan verbatim.
   - **Women's:** Savannah Marshall, Natasha Jonas, Lauren Price, Caroline Dubois,
     Ellie Scotney, Chantelle Cameron, Sandy Ryan, Rhiannon Dixon, Terri Harper
 
-## Suggested first task
-Phase 1 from the plan: scaffold the C# Web API + EF Core, create the Supabase
-Postgres schema (fighters / events / bouts / articles), then scaffold the Nuxt
-site shell with the core components. Seed 10–20 fighters from the list above using
-**verified** records (run `britboxing_wikifetch.py`, eyeball the output, then
-insert). Hold off on Twitter and full automation until the data + review flow is solid.
+## Current state (2026-07-02)
+The pipeline is live and fully automated, entirely in **C#** (`backend/` — the
+Python `pipeline/` POC is retired, in git history):
+- GitHub Actions runs the job every 3 hours (`.github/workflows/pipeline.yml`;
+  secrets in repo Actions settings) — this resolved the scheduler question:
+  external cron trigger, not an always-on instance.
+- Flow: RSS collect → seen-items skip (Supabase `seen_feed_items`) → extraction
+  (regex-first, Claude fallback) → dedup → decide (upcoming vs result) →
+  Wikipedia snapshots → bouts (frozen records) → auto-published articles →
+  Render deploy hook (static site rebuild only when content changed).
+- The site (`web/`, Nuxt) is a Render **static site**: code pushes auto-deploy;
+  DB-only changes need the deploy hook (the pipeline handles this).
+- Note: articles currently **auto-publish** (owner's decision 2026-07-01),
+  which trades against correction #3's review-gate advice — revisit if quality
+  or SEO issues appear.
 
 ## Open questions to confirm with the developer
 - Canonical domain confirmed as `.co.uk`? (assumed yes)
-- Scheduler choice: always-on Render instance, or external cron trigger?
 - Initial fighter pool size: marquee names only, or full top-10-per-division?
