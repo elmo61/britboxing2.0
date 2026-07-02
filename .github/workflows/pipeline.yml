@@ -1,0 +1,46 @@
+# Scheduled content pipeline — runs the C# feed job (collect -> extract ->
+# decide -> bout -> article) and, when it created content, POSTs the Render
+# deploy hook so the static site rebuilds. See backend/ for the app itself.
+#
+# Secrets required (repo Settings -> Secrets and variables -> Actions):
+#   ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SECRET_KEY, RENDER_DEPLOY_HOOK_URL
+name: Content pipeline
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # every 3 hours on the hour (UTC, best-effort timing)
+  workflow_dispatch: # manual "Run workflow" button in the Actions tab
+
+# A run that overlaps a still-going previous run would double-process the
+# same feed items (both would read the same seen-items state), so queue at
+# most one behind and never run two at once.
+concurrency:
+  group: content-pipeline
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('backend/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Run feed pipeline
+        working-directory: backend
+        run: dotnet run --project src/BritBoxingFeeds.App --configuration Release
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
