@@ -28,6 +28,9 @@ public record FightAnnouncement
     /// <summary>Set by the LLM extractor: true = an announced/upcoming fight, false = coverage of a fight that already happened, null = extractor couldn't tell (or regex-only pass).</summary>
     public bool? IsUpcoming { get; init; }
 
+    /// <summary>Set by the LLM extractor: "confirmed" (officially announced), "rumoured" (talks/speculation), "cancelled" (called off), or null when it couldn't tell.</summary>
+    public string? FightStatus { get; init; }
+
     /// <summary>Full article/press release body, if the source provides it. Used by the downstream extractor.</summary>
     public string? ArticleBody { get; init; }
 

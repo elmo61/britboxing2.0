@@ -25,7 +25,7 @@ function height(i: number | null): string {
 
 interface Col {
   name: string; record: string; ko: string; stance: string
-  age: string; height: string; reach: string; last5: string[]; unverified: boolean
+  age: string; height: string; reach: string; last5: string[]
 }
 function toCol(s: any): Col {
   const r = s.record, ph = s.physical, fm = s.form
@@ -39,7 +39,6 @@ function toCol(s: any): Col {
     height: height(ph.heightInches),
     reach: ph.reachInches ? `${ph.reachInches}″` : '—',
     last5: fm.last5 ?? [],
-    unverified: !!fm._unverified,
   }
 }
 const a = computed(() => toCol(props.fighterA))
@@ -79,7 +78,7 @@ const b = computed(() => toCol(props.fighterB))
           <span v-for="(r, j) in a.last5" :key="j" class="pill" :class="pillClass[r[0]] || 'n'">{{ r }}</span>
           <span v-if="!a.last5.length" class="muted">—</span>
         </div>
-        <span class="lab">Last 5<span v-if="a.unverified || b.unverified" class="flag">unverified</span></span>
+        <span class="lab">Last 5</span>
         <div class="pills r">
           <span v-for="(r, j) in b.last5" :key="j" class="pill" :class="pillClass[r[0]] || 'n'">{{ r }}</span>
           <span v-if="!b.last5.length" class="muted">—</span>
@@ -126,10 +125,6 @@ const b = computed(() => toCol(props.fighterB))
 .lab {
   font-family: var(--font-cond); font-weight: 500; font-size: .66rem;
   letter-spacing: .2em; text-transform: uppercase; color: var(--muted); text-align: center;
-}
-.flag {
-  display: inline-block; font-size: .58rem; color: var(--gold); letter-spacing: .04em;
-  border: 1px solid var(--gold); border-radius: 3px; padding: 0 4px; margin-left: 6px;
 }
 .pills { display: flex; gap: 4px; flex-wrap: wrap; min-width: 0; }
 .pills.l { justify-content: flex-end; padding-right: 18px; }

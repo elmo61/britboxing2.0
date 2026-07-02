@@ -11,7 +11,7 @@ export async function getFightList() {
   const sb = useSupabase()
   const { data, error } = await sb
     .from('bouts')
-    .select('slug, weight_class, event_date, fighter_a_snapshot, fighter_b_snapshot, articles!inner(title, summary, published_at)')
+    .select('slug, status, weight_class, event_date, fighter_a_snapshot, fighter_b_snapshot, articles!inner(title, summary, published_at)')
   if (error) throw createError({ statusCode: 502, statusMessage: error.message })
   return (data ?? [])
     .map((b: any) => {
@@ -22,6 +22,7 @@ export async function getFightList() {
         summary: art?.summary ?? '',
         matchup: `${b.fighter_a_snapshot?._meta?.name} vs ${b.fighter_b_snapshot?._meta?.name}`,
         division: b.weight_class ?? '',
+        status: b.status ?? 'confirmed',
         postedAt: art?.published_at ?? null,
         eventDate: b.event_date ?? null,
       }
@@ -34,7 +35,7 @@ export async function getFight(slug: string) {
   const sb = useSupabase()
   const { data, error } = await sb
     .from('bouts')
-    .select('slug, weight_class, event_date, source, headline, fighter_a_id, fighter_b_id, '
+    .select('slug, status, weight_class, event_date, source, headline, fighter_a_id, fighter_b_id, '
       + 'fighter_a_snapshot, fighter_b_snapshot, articles!inner(title, summary, body, tags, ai_generated, slug, published_at)')
     .eq('slug', slug)
     .single()
@@ -49,6 +50,7 @@ export async function getFight(slug: string) {
       fighterBId: data.fighter_b_id,
       weightClass: data.weight_class,
       eventDate: data.event_date,
+      status: data.status ?? 'confirmed',
       source: data.source,
       headline: data.headline,
     },
@@ -57,25 +59,21 @@ export async function getFight(slug: string) {
   }
 }
 
-/** Roster list with a fight count per fighter. */
+/** Roster list, alphabetical, with divisions for filtering. */
 export async function getFighterList() {
   const sb = useSupabase()
-  const [fighters, bouts] = await Promise.all([
-    sb.from('fighters').select('id, name, has_wikipedia, wins, losses, draws').order('name'),
-    sb.from('bouts').select('fighter_a_id, fighter_b_id'),
-  ])
-  if (fighters.error) throw createError({ statusCode: 502, statusMessage: fighters.error.message })
-  const counts: Record<string, number> = {}
-  for (const b of bouts.data ?? []) {
-    counts[b.fighter_a_id] = (counts[b.fighter_a_id] ?? 0) + 1
-    counts[b.fighter_b_id] = (counts[b.fighter_b_id] ?? 0) + 1
-  }
-  return (fighters.data ?? []).map((f: any) => ({
+  const { data, error } = await sb
+    .from('fighters')
+    .select('id, name, has_wikipedia, wins, losses, draws, weight_classes, nationality')
+    .order('name')
+  if (error) throw createError({ statusCode: 502, statusMessage: error.message })
+  return (data ?? []).map((f: any) => ({
     id: f.id,
     name: f.name,
     record: f.wins == null ? null : `${f.wins}-${f.losses ?? 0}-${f.draws ?? 0}`,
     hasWikipedia: !!f.has_wikipedia,
-    boutCount: counts[f.id] ?? 0,
+    divisions: f.weight_classes ?? [],
+    nationality: f.nationality ?? null,
   }))
 }
 
@@ -87,7 +85,7 @@ export async function getFighterProfile(id: string) {
 
   const { data: bouts } = await sb
     .from('bouts')
-    .select('slug, fighter_a_id, fighter_b_id, weight_class')
+    .select('slug, status, fighter_a_id, fighter_b_id, weight_class')
     .or(`fighter_a_id.eq.${id},fighter_b_id.eq.${id}`)
     .order('slug')
 
@@ -106,6 +104,7 @@ export async function getFighterProfile(id: string) {
       opponentId: oppId(b),
       opponentName: names[oppId(b)] ?? oppId(b),
       division: b.weight_class ?? '',
+      status: b.status ?? 'confirmed',
     })),
   }
 }

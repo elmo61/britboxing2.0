@@ -30,7 +30,10 @@ useHead(() => ({
     <NuxtLink to="/" class="back">← All previews</NuxtLink>
 
     <div class="masthead"><BritLogo /></div>
-    <div class="kicker">Fight preview<template v-if="f.bout.weightClass"> · {{ f.bout.weightClass }}</template></div>
+    <div class="kicker">
+      Fight preview<template v-if="f.bout.weightClass"> · {{ f.bout.weightClass }}</template>
+      <span class="status" :class="`status--${f.bout.status}`">{{ f.bout.status }}</span>
+    </div>
     <h1>{{ f.article.title }}</h1>
     <div class="meta-dates">
       <template v-if="formatEventDate(f.bout.eventDate)">Fight date <strong>{{ formatEventDate(f.bout.eventDate) }}</strong></template>
@@ -62,7 +65,6 @@ useHead(() => ({
         (<template v-for="(s, i) in wikiSources" :key="i"><a :href="s.url">{{ s.label }}</a><template v-if="i === 0"> · </template></template>),
         licensed
         <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC&nbsp;BY-SA&nbsp;4.0</a>.
-        Recent-form (last 5) is auto-derived and <em>unverified</em>, pending human review.
       </p>
       <p>Records reflect each fighter's data at the time this preview was published.</p>
     </footer>

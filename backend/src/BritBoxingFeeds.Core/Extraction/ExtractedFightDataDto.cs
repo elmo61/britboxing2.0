@@ -16,4 +16,5 @@ internal class ExtractedFightDataDto
     public string? TitleOnTheLine { get; set; }
     public string? Broadcaster { get; set; }
     public bool? IsUpcoming { get; set; }        // true = announced/scheduled, false = result/report of a past fight, null = can't tell
+    public string? Status { get; set; }          // "confirmed" | "rumoured" | "cancelled", null = can't tell
 }

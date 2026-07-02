@@ -13,7 +13,7 @@ const rec = f.latest?.record ?? {}
 const phys = f.latest?.physical ?? {}
 
 function recordLine(r: any): string {
-  if (r.wins == null) return 'record unverified'
+  if (r.wins == null) return '—'
   return `${r.wins}-${r.losses ?? 0}-${r.draws ?? 0}`
 }
 function koPct(r: any): number | null {
@@ -35,7 +35,7 @@ useHead({ title: `${f.name} | BritBoxing` })
     <h1 class="bigname">{{ f.name }}</h1>
 
     <div v-if="!f.hasWikipedia" class="announce">
-      Limited data for this fighter — full record not yet verified.
+      Limited data available for this fighter.
     </div>
 
     <dl class="profile">
@@ -52,6 +52,7 @@ useHead({ title: `${f.name} | BritBoxing` })
       <li v-for="b in bouts" :key="b.slug">
         <NuxtLink :to="`/fights/${b.slug}`">vs {{ b.opponentName }}</NuxtLink>
         <span v-if="b.division" class="div">{{ b.division }}</span>
+        <span class="status" :class="`status--${b.status}`">{{ b.status }}</span>
       </li>
       <li v-if="!bouts.length" class="muted">No previews yet.</li>
     </ul>

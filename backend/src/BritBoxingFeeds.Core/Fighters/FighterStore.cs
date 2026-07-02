@@ -67,6 +67,7 @@ public class FighterStore
             ["id"] = id,
             ["name"] = name,
             ["dob"] = dob,
+            ["nationality"] = meta["nationality"]?.DeepClone(),
             ["wikipedia_title"] = hasWikipedia
                 ? meta["source"]?.GetValue<string>()?.Split('/').LastOrDefault()
                 : null,

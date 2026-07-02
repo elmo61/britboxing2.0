@@ -53,8 +53,11 @@ services.AddHttpClient();
 // (Promoter scrapers like MatchroomSource are intentionally NOT registered —
 // BritBoxing policy is news RSS as the announcement trigger, not scraping.)
 services.AddTransient<IFightSource, BbcBoxingSource>();
-services.AddTransient<IFightSource, BoxingSceneSource>();
 services.AddTransient<IFightSource, WorldBoxingNewsSource>();
+services.AddTransient<IFightSource, GuardianBoxingSource>();
+services.AddTransient<IFightSource, TalkSportBoxingSource>();
+services.AddTransient<IFightSource, BoxingNewsOnlineSource>();
+// BoxingSceneSource removed 2026-07-02: their RSS 403s all automated requests.
 
 // YouTube sources need a channel ID per channel, so register instances directly:
 // services.AddTransient<IFightSource>(sp =>

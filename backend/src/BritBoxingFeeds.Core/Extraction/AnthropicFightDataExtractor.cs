@@ -105,7 +105,8 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
                 WeightClass = dto.WeightClass ?? raw.WeightClass,
                 TitleOnTheLine = dto.TitleOnTheLine ?? raw.TitleOnTheLine,
                 Broadcaster = dto.Broadcaster ?? raw.Broadcaster,
-                IsUpcoming = dto.IsUpcoming ?? raw.IsUpcoming
+                IsUpcoming = dto.IsUpcoming ?? raw.IsUpcoming,
+                FightStatus = dto.Status ?? raw.FightStatus
             };
         }
         catch (Exception ex)
@@ -134,7 +135,8 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
           "weightClass": string | null,
           "titleOnTheLine": string | null,  // e.g. "WBC", "IBF", null if not a title fight
           "broadcaster": string | null,     // e.g. "DAZN", "Sky Sports", null if not mentioned
-          "isUpcoming": boolean | null      // true = an announced/scheduled fight; false = a report/result of a fight that already happened; null = can't tell
+          "isUpcoming": boolean | null,     // true = an announced/scheduled fight; false = a report/result of a fight that already happened; null = can't tell
+          "status": string | null           // "confirmed" = officially announced/signed; "rumoured" = talks/speculation/being ordered; "cancelled" = called off/postponed; null = can't tell
         }
         """);
         sb.AppendLine();

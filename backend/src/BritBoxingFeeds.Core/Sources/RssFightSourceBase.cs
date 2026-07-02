@@ -22,6 +22,11 @@ public abstract class RssFightSourceBase : IFightSource
     {
         _http = http;
         _feedUrl = feedUrl;
+        // Some publishers 403 UA-less requests; identify ourselves politely.
+        if (!_http.DefaultRequestHeaders.UserAgent.Any())
+        {
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("BritBoxingBot/1.0 (+https://britboxing.co.uk)");
+        }
     }
 
     public virtual async Task<IReadOnlyList<FightAnnouncement>> GetLatestFightsAsync(CancellationToken ct = default)

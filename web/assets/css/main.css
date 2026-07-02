@@ -122,6 +122,17 @@ footer.attribution a { color: var(--muted); }
   margin-top: 12px;
 }
 
+/* fight status chip — confirmed / rumoured / cancelled */
+.status {
+  display: inline-block; font-family: var(--font-cond); font-weight: 600;
+  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
+  border: 1px solid; border-radius: 3px; padding: 1px 6px; margin-left: 8px;
+  vertical-align: middle;
+}
+.status--confirmed { color: var(--win); border-color: var(--win); }
+.status--rumoured { color: var(--muted); border-color: var(--muted); }
+.status--cancelled { color: var(--loss); border-color: var(--loss); text-decoration: line-through; }
+
 /* posted / fight-date meta line on the article page */
 .meta-dates {
   font-family: var(--font-cond); font-weight: 500; font-size: .8rem;

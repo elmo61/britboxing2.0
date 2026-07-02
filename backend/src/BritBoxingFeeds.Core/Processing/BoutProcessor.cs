@@ -64,6 +64,20 @@ public class BoutProcessor
                 continue; // not fight-keyed; nothing to decide
             }
 
+            // A cancellation report isn't a new fight — but if we've already
+            // previewed this bout, flip its status so the site shows it's off.
+            if (item.FightStatus == "cancelled")
+            {
+                var cancelled = await TryCancelExistingBoutAsync(item, ct);
+                await _seenStore.SetStatusAsync(item, "ignored",
+                    cancelled ? "cancellation — existing bout marked cancelled" : "cancelled fight, no bout to update",
+                    sourceKey: sourceKey, ct: ct);
+                _logger.LogInformation("Cancellation for '{F1} vs {F2}' ({Outcome})",
+                    item.Fighter1, item.Fighter2, cancelled ? "bout updated" : "no existing bout");
+                ignored++;
+                continue;
+            }
+
             // ---- Decide -------------------------------------------------
             var reason = DecideIgnoreReason(item);
             if (reason is not null)
@@ -141,6 +155,9 @@ public class BoutProcessor
                 ["slug"] = slug,
                 ["fighter_a_id"] = fidA,
                 ["fighter_b_id"] = fidB,
+                // No LLM verdict -> a dated announcement reads as confirmed, an
+                // undated one as still-in-the-works.
+                ["status"] = item.FightStatus ?? (item.EventDate is not null ? "confirmed" : "rumoured"),
                 ["weight_class"] = bout["weightClass"]?.DeepClone(),
                 ["event_date"] = bout["eventDate"]?.DeepClone(),
                 ["announced_at"] = bout["announcedAt"]?.DeepClone(),
@@ -241,6 +258,29 @@ public class BoutProcessor
             _logger.LogInformation("Recovered article for {Slug}", slug);
         }
         return recovered;
+    }
+
+    /// <summary>Marks the existing bout row (either fighter order) cancelled. Returns false when no bout exists for this pairing.</summary>
+    private async Task<bool> TryCancelExistingBoutAsync(FightAnnouncement item, CancellationToken ct)
+    {
+        // Resolve names to ids the same way bout creation does, but without
+        // creating anything — sparse snapshots are fine for a slug lookup.
+        var snapA = await _wikipedia.BuildSnapshotAsync(item.Fighter1!, allowSparse: true, ct);
+        var snapB = await _wikipedia.BuildSnapshotAsync(item.Fighter2!, allowSparse: true, ct);
+        if (snapA is null || snapB is null) return false;
+
+        var fidA = await _fighters.FighterIdAsync(snapA["_meta"]!["name"]!.GetValue<string>(), snapA["physical"]?["dob"]?.GetValue<string>(), ct);
+        var fidB = await _fighters.FighterIdAsync(snapB["_meta"]!["name"]!.GetValue<string>(), snapB["physical"]?["dob"]?.GetValue<string>(), ct);
+
+        var slugs = $"{fidA}-vs-{fidB},{fidB}-vs-{fidA}";
+        var existing = await _supabase.SelectAsync("bouts", $"select=slug&slug=in.({Uri.EscapeDataString(slugs)})", ct);
+        if (existing.Count == 0) return false;
+
+        var slug = existing[0]!["slug"]!.GetValue<string>();
+        await _supabase.UpdateAsync("bouts", $"slug=eq.{Uri.EscapeDataString(slug)}",
+            new JsonObject { ["status"] = "cancelled" }, ct);
+        _logger.LogInformation("Marked bout {Slug} cancelled", slug);
+        return true;
     }
 
     /// <summary>Null = process it; otherwise the ignore_reason to record.</summary>

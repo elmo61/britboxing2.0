@@ -7,6 +7,7 @@ create table if not exists fighters (
     id              text primary key,          -- stable slug, e.g. 'anthony-joshua'
     name            text not null,
     dob             date,
+    nationality     text,                      -- from the Wikipedia infobox; often null (infoboxes omit it)
     wikipedia_title text,
     has_wikipedia   boolean not null default false,
     -- promoted from the latest snapshot for easy querying / division pages
@@ -40,6 +41,7 @@ create table if not exists bouts (
     slug               text primary key,        -- '<fighterAId>-vs-<fighterBId>'
     fighter_a_id       text references fighters(id),
     fighter_b_id       text references fighters(id),
+    status             text not null default 'confirmed', -- confirmed | rumoured | cancelled
     weight_class       text,
     event_id           bigint references events(id),
     event_date         date,                    -- null = TBC
@@ -63,6 +65,10 @@ create table if not exists articles (
     ai_generated boolean not null default true,
     published_at timestamptz not null default now()
 );
+
+-- Idempotent upgrade for databases created before the columns existed.
+alter table fighters add column if not exists nationality text;
+alter table bouts    add column if not exists status text not null default 'confirmed';
 
 create index if not exists idx_bouts_fighter_a on bouts(fighter_a_id);
 create index if not exists idx_bouts_fighter_b on bouts(fighter_b_id);

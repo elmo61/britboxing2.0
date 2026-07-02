@@ -15,7 +15,7 @@ useHead({
     </div>
     <h1>Fight previews</h1>
     <p class="lede">
-      {{ fights?.length ?? 0 }} previews. Click through to compare how each reads.
+      Data-driven previews of the fights that matter.
       <NuxtLink to="/fighters" class="navlink">Browse fighters →</NuxtLink>
     </p>
 
@@ -28,6 +28,7 @@ useHead({
       >
         <div class="kicker">
           {{ f.division }}<template v-if="f.division && formatEventDate(f.eventDate)"> · </template><template v-if="formatEventDate(f.eventDate)">{{ formatEventDate(f.eventDate) }}</template>
+          <span class="status" :class="`status--${f.status}`">{{ f.status }}</span>
         </div>
         <h2>{{ f.title }}</h2>
         <div class="matchup">{{ f.matchup }}</div>
