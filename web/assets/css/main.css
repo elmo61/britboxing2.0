@@ -4,15 +4,19 @@
   --panel: #101015;
   --panel-2: #14141a;
   --line: #26242a;
+  --line-2: #34313b;
   --ink: #f4efe6;
   --muted: #9a958c;
   --red: #cf142b;        /* Union Jack red — also the "red corner" */
   --blue: #5b8be0;       /* readable blue on dark — the "blue corner" */
   --navy: #012169;       /* Union Jack blue, for solid accents */
+  --red-bright: #e23350;  /* red corner text/labels — lifted for dark-bg legibility */
   --gold: #e8b84b;
   --win: #2f9e57;
   --loss: #c0392b;
   --draw: #6a6a72;
+
+  --maxw: 1060px;         /* shared content width (header, grid, footer align to this) */
 
   --font-display: "Anton", Impact, sans-serif;   /* fighter names, big numerals */
   --font-cond: "Oswald", sans-serif;             /* headings, labels, wordmark */
@@ -99,28 +103,88 @@ footer.attribution a { color: var(--muted); }
 }
 .navlink:hover { text-decoration: underline; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
+/* homepage controls row (title + filters) */
+.controls {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 14px; padding: 4px 0 16px;
+}
+.controls h1 { margin: 0; }
+.filters { display: flex; gap: 10px; flex-wrap: wrap; }
+.filters select, .filters input {
+  font-family: var(--font-cond); font-weight: 500; font-size: .82rem; letter-spacing: .06em;
+  color: var(--ink); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; padding: 9px 13px; text-transform: uppercase; cursor: pointer;
+}
+.filters input { text-transform: none; min-width: 200px; }
+.filters select:focus-visible, .filters input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+.sharehint {
+  font-family: var(--font-cond); font-size: .74rem; letter-spacing: .05em;
+  color: var(--muted); margin: 0 0 18px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.sharehint code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  color: var(--gold); background: rgba(232, 184, 75, .08);
+  border: 1px solid rgba(232, 184, 75, .2); border-radius: 4px; padding: 2px 7px; font-size: .82em;
+}
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+
+/* fight card (homepage) — three size tiers share one look */
 .card {
-  display: block; text-decoration: none; color: inherit; background: var(--panel);
-  border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px;
-  transition: border-color .15s, transform .15s;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; text-decoration: none; color: inherit; cursor: pointer;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px 20px 16px; transition: transform .16s, border-color .16s, background .16s;
 }
-.card:hover { border-color: var(--gold); transform: translateY(-2px); }
-.card .kicker { min-height: 1em; }
-.card h2 {
-  font-family: var(--font-cond); font-weight: 600; font-size: 1.18rem;
-  line-height: 1.2; margin: 6px 0 4px;
+.card > *:not(.card__motif) { position: relative; z-index: 1; }
+.card__motif {
+  position: absolute; right: -10px; bottom: 0; z-index: 0;
+  height: 80%; width: auto;            /* standard cards: motif ~80% of card height */
+  opacity: .07; pointer-events: none; user-select: none;
+  transition: opacity .16s;
 }
-.card .matchup {
-  font-family: var(--font-cond); font-weight: 600; text-transform: uppercase;
-  letter-spacing: .04em; color: var(--red); font-size: .92rem; margin-bottom: 8px;
-}
-.card p { color: var(--muted); font-size: .92rem; margin: 0; }
-.card .posted {
-  font-family: var(--font-cond); font-weight: 500; font-size: .72rem;
+.card:hover .card__motif { opacity: .12; }
+.card:hover { transform: translateY(-3px); border-color: var(--line-2, #34313b); background: var(--panel-2); }
+.card:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.card__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.card__meta {
+  font-family: var(--font-cond); font-weight: 500; font-size: .7rem;
   letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
-  margin-top: 12px;
 }
+.card__fighters {
+  display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; margin: 14px 0 0;
+  font-family: var(--font-display); font-weight: 400; text-transform: uppercase;
+  font-size: 1.55rem; line-height: 1;
+}
+.card__vs { color: var(--muted); font-family: var(--font-cond); font-weight: 600; font-size: .9rem; }
+.card__sum { color: var(--muted); font-size: .92rem; margin: 10px 0 0; flex: 1; }
+.card__cta {
+  font-family: var(--font-cond); font-weight: 600; font-size: .74rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--gold); margin-top: 14px;
+}
+/* chip inside a card sits flush-left (override the inline .status margin) */
+.card__top .status { margin-left: 0; }
+
+/* tier 1 — featured (latest), ~2x */
+.card--feat { grid-column: span 2; padding: 26px 28px 24px; background: linear-gradient(160deg, #14131a, #101015 70%); border-color: var(--line-2, #34313b); }
+.card--feat .card__fighters { font-size: clamp(2rem, 4.4vw, 3.1rem); margin-top: 18px; }
+.card--feat .card__sum { font-size: 1rem; }
+.card--feat .card__motif { height: auto; width: 230px; right: -26px; bottom: -40px; opacity: .06; }
+.card__flag { font-family: var(--font-cond); font-weight: 600; font-size: .64rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
+@media (max-width: 640px) { .card--feat { grid-column: span 1; } }
+
+/* tier 3 — compact cards: same look, shorter, basics only */
+.more-head {
+  grid-column: 1 / -1; font-family: var(--font-cond); font-weight: 600; font-size: .74rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
+  margin: 18px 0 0; padding-top: 22px; border-top: 1px solid var(--line);
+}
+.card--mini { padding: 14px 18px; }
+.card--mini .card__fighters { font-size: 1.3rem; margin-top: 10px; }
+.card--mini .card__motif { height: auto; width: 88px; right: -10px; bottom: -14px; }
+
+.empty { color: var(--muted); font-family: var(--font-cond); letter-spacing: .04em; padding: 20px 2px; }
 
 /* fight status chip — confirmed / rumoured / cancelled */
 .status {
@@ -140,3 +204,122 @@ footer.attribution a { color: var(--muted); }
   margin: 2px 0 10px;
 }
 .meta-dates strong { color: var(--gold); font-weight: 600; }
+
+/* ============================================================
+   Shared shell — collapsing header + footer (layouts/default.vue)
+   ============================================================ */
+.site-head {
+  position: sticky; top: 0; z-index: 30;
+  background: linear-gradient(180deg, #0c0c11, #0a0a0c);
+  border-bottom: 1px solid var(--line);
+  transition: box-shadow .25s, background .25s;
+}
+.site-head.is-collapsed {
+  background: rgba(10, 10, 12, .9); backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+}
+.site-head__inner {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: clamp(22px, 4vw, 38px) clamp(16px, 5vw, 48px);
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  transition: padding .28s cubic-bezier(.4, 0, .2, 1);
+}
+.site-head.is-collapsed .site-head__inner { padding-top: 11px; padding-bottom: 11px; }
+
+.brand { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.brand__mark {
+  font-family: var(--font-cond); font-weight: 700; line-height: 1; text-decoration: none;
+  font-size: clamp(1.8rem, 4.6vw, 2.6rem); letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
+  transition: font-size .28s cubic-bezier(.4, 0, .2, 1);
+}
+.brand__mark span { color: var(--gold); }
+.site-head.is-collapsed .brand__mark { font-size: 1.3rem; }
+.brand__tagline {
+  font-family: var(--font-cond); font-weight: 500; font-size: .82rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0;
+  max-height: 2em; opacity: 1; overflow: hidden;
+  transition: max-height .28s, opacity .2s;
+}
+.site-head.is-collapsed .brand__tagline { max-height: 0; opacity: 0; }
+
+.mainnav { display: flex; gap: 4px; flex-shrink: 0; }
+.mainnav a {
+  font-family: var(--font-cond); font-weight: 500; font-size: .82rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+  padding: 8px 14px; border-radius: 5px; text-decoration: none; transition: color .15s;
+}
+.mainnav a:hover { color: var(--ink); }
+.mainnav a.is-active { color: var(--ink); }
+.mainnav a.is-active::after { content: ""; display: block; height: 2px; margin-top: 5px; background: var(--gold); border-radius: 2px; }
+
+.site-foot { border-top: 1px solid var(--line); margin-top: 44px; }
+.site-foot__inner {
+  max-width: var(--maxw); margin: 0 auto; padding: 30px clamp(16px, 5vw, 48px);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+}
+.site-foot__note { color: var(--muted); font-size: .82rem; max-width: 46ch; margin: 0; }
+.site-foot__note a { color: var(--muted); }
+.site-foot__nav { display: flex; gap: 18px; }
+.site-foot__nav a {
+  font-family: var(--font-cond); font-weight: 500; font-size: .78rem;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-decoration: none;
+}
+.site-foot__nav a:hover { color: var(--ink); }
+
+/* ============================================================
+   Fight page — poster band + bill strip
+   (tale-of-the-tape lives in components/FightCard.vue)
+   ============================================================ */
+.poster-band {
+  position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 12px;
+  padding: clamp(24px, 4vw, 40px) clamp(18px, 4vw, 40px) clamp(28px, 4vw, 38px);
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(232, 184, 75, .08), transparent 60%),
+    repeating-linear-gradient(0deg, #0d0d12, #0d0d12 2px, #0a0a0c 2px, #0a0a0c 4px);
+}
+.poster-band > *:not(img) { position: relative; z-index: 1; }
+/* the two fighters flanking the poster — face inward toward the VS */
+.poster-fighter {
+  position: absolute; bottom: 0; width: 36%; max-width: 40%; height: auto;
+  opacity: .09; z-index: 0; pointer-events: none; user-select: none;
+}
+.poster-fighter--l { left: -6px; }
+.poster-fighter--r { right: -6px; }
+@media (max-width: 760px) { .poster-fighter { width: 30%; opacity: .06; } }
+.poster { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(10px, 3vw, 34px); margin: 20px 0 0; }
+.corner { min-width: 0; }
+.corner--blue { text-align: right; }
+.corner__tag { font-family: var(--font-cond); font-weight: 600; font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 7px; }
+.corner--red .corner__tag { color: var(--red-bright); }
+.corner--blue .corner__tag { color: var(--blue); flex-direction: row-reverse; }
+.corner__tag::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.pname {
+  font-family: var(--font-display); font-weight: 400; text-transform: uppercase; letter-spacing: .005em;
+  font-size: clamp(2.1rem, 6.5vw, 4.4rem); line-height: .9; margin: 8px 0 10px;
+}
+.pname a { color: inherit; text-decoration: none; }
+.pname a:hover { color: var(--gold); }
+.prec { font-family: var(--font-cond); font-weight: 600; font-size: 1.05rem; color: var(--gold); letter-spacing: .03em; font-variant-numeric: tabular-nums; }
+.pvs {
+  font-family: var(--font-display); font-size: clamp(1.3rem, 3vw, 2rem);
+  width: clamp(50px, 8vw, 70px); height: clamp(50px, 8vw, 70px);
+  display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--line-2);
+  background: radial-gradient(circle at 50% 35%, #1b1a22, #0c0c10); box-shadow: 0 6px 24px rgba(0, 0, 0, .5);
+}
+.billstrip {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 18px;
+  margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line);
+  font-family: var(--font-cond); font-weight: 500; font-size: .84rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+.billstrip strong { color: var(--ink); font-weight: 600; }
+.billstrip .status { margin-left: 0; }
+
+@media (max-width: 620px) {
+  .poster { grid-template-columns: 1fr; gap: 6px; text-align: center; }
+  .corner--blue { text-align: center; }
+  .corner--blue .corner__tag { flex-direction: row; }
+  .pvs { margin: 6px auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-head__inner, .brand__mark, .brand__tagline, .card { transition: none; }
+}

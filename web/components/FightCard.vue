@@ -1,152 +1,114 @@
 <script setup lang="ts">
-// Head-to-head "tale of the tape" — the data-driven core of every preview.
-// Fighter A = red corner, Fighter B = blue corner. Names link to fighter pages.
+// Tale of the tape — opposing bars from a centre spine. Each fighter's bar
+// extends outward on a shared scale, so the longer bar genuinely means "more";
+// the leading figure is marked gold. Age is shown as plain figures (younger
+// isn't "more") with the younger man flagged. All values come from the frozen
+// snapshot; a row is shown only when both fighters have that value.
 const props = defineProps<{
   fighterA: Record<string, any>
   fighterB: Record<string, any>
-  hrefA?: string
-  hrefB?: string
 }>()
 
-const pillClass: Record<string, string> = { W: 'w', L: 'l', D: 'd', N: 'n' }
-
+function inchToFtIn(n: number): string { return `${Math.floor(n / 12)}′${n % 12}″` }
+function clampPct(p: number): number { return Math.max(6, Math.min(100, p)) }
 function koPct(r: any): number | null {
   if (!r?.wins || r?.winsKo == null) return null
   return Math.round((r.winsKo / r.wins) * 100)
 }
-function recordLine(r: any): string {
-  if (r.wins == null) return '—'
-  const base = `${r.wins}-${r.losses ?? 0}-${r.draws ?? 0}`
-  return r.noContests ? `${base} (${r.noContests} NC)` : base
-}
-function height(i: number | null): string {
-  return i ? `${Math.floor(i / 12)}′${i % 12}″` : '—'
+
+interface Row {
+  label: string
+  redDisp: string; blueDisp: string
+  redPct: number; bluePct: number
+  redEdge: boolean; blueEdge: boolean
 }
 
-interface Col {
-  name: string; record: string; ko: string; stance: string
-  age: string; height: string; reach: string; last5: string[]
-}
-function toCol(s: any): Col {
-  const r = s.record, ph = s.physical, fm = s.form
-  const pct = koPct(r)
-  return {
-    name: s._meta.name,
-    record: recordLine(r),
-    ko: r.winsKo == null ? '—' : `${r.winsKo}${pct != null ? ` (${pct}%)` : ''}`,
-    stance: ph.stance ?? '—',
-    age: ph.age ?? '—',
-    height: height(ph.heightInches),
-    reach: ph.reachInches ? `${ph.reachInches}″` : '—',
-    last5: fm.last5 ?? [],
+const rows = computed<Row[]>(() => {
+  const a = props.fighterA, b = props.fighterB
+  const out: Row[] = []
+  const metrics: { label: string; get: (s: any) => number | null; min: number; max: number; disp: (v: number) => string }[] = [
+    { label: 'Reach', get: (s) => s.physical?.reachInches ?? null, min: 60, max: 90, disp: (v) => `${v}″` },
+    { label: 'Height', get: (s) => s.physical?.heightInches ?? null, min: 60, max: 84, disp: inchToFtIn },
+    { label: 'KO ratio', get: (s) => koPct(s.record), min: 0, max: 100, disp: (v) => `${v}%` },
+  ]
+  for (const m of metrics) {
+    const rv = m.get(a), bv = m.get(b)
+    if (rv == null || bv == null) continue
+    out.push({
+      label: m.label,
+      redDisp: m.disp(rv), blueDisp: m.disp(bv),
+      redPct: clampPct(((rv - m.min) / (m.max - m.min)) * 100),
+      bluePct: clampPct(((bv - m.min) / (m.max - m.min)) * 100),
+      redEdge: rv > bv, blueEdge: bv > rv,
+    })
   }
-}
-const a = computed(() => toCol(props.fighterA))
-const b = computed(() => toCol(props.fighterB))
+  return out
+})
+
+const ages = computed(() => {
+  const r = props.fighterA.physical?.age, b = props.fighterB.physical?.age
+  if (r == null || b == null) return null
+  return { r, b, redYounger: r < b, blueYounger: b < r }
+})
+
+// Animate the bars from zero once mounted (skipped under reduced motion).
+const shown = ref(false)
+onMounted(() => {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { shown.value = true; return }
+  requestAnimationFrame(() => setTimeout(() => { shown.value = true }, 60))
+})
 </script>
 
 <template>
-  <div class="bill">
-    <div class="names">
-      <div class="fighter">
-        <div class="corner red">● Red corner</div>
-        <h3 class="fname">
-          <NuxtLink v-if="hrefA" :to="hrefA">{{ a.name }}</NuxtLink>
-          <template v-else>{{ a.name }}</template>
-        </h3>
-        <div class="rec">{{ a.record }}</div>
+  <div v-if="rows.length || ages" class="tape">
+    <p class="tape__head">Tale of the tape</p>
+
+    <div v-for="row in rows" :key="row.label" class="tt">
+      <div class="tt__side tt__side--red">
+        <span class="tt__val" :class="{ 'is-edge': row.redEdge }">{{ row.redDisp }}</span>
+        <div class="tt__track"><div class="tt__fill tt__fill--red" :style="{ width: shown ? row.redPct + '%' : '0%' }"></div></div>
       </div>
-      <div class="vs">VS</div>
-      <div class="fighter right">
-        <div class="corner blue">Blue corner ●</div>
-        <h3 class="fname">
-          <NuxtLink v-if="hrefB" :to="hrefB">{{ b.name }}</NuxtLink>
-          <template v-else>{{ b.name }}</template>
-        </h3>
-        <div class="rec">{{ b.record }}</div>
+      <span class="tt__lab">{{ row.label }}</span>
+      <div class="tt__side tt__side--blue">
+        <span class="tt__val" :class="{ 'is-edge': row.blueEdge }">{{ row.blueDisp }}</span>
+        <div class="tt__track"><div class="tt__fill tt__fill--blue" :style="{ width: shown ? row.bluePct + '%' : '0%' }"></div></div>
       </div>
     </div>
 
-    <div class="tape">
-      <div class="row"><span class="v l">{{ a.ko }}</span><span class="lab">KO wins</span><span class="v r">{{ b.ko }}</span></div>
-      <div class="row"><span class="v l">{{ a.stance }}</span><span class="lab">Stance</span><span class="v r">{{ b.stance }}</span></div>
-      <div class="row"><span class="v l">{{ a.age }}</span><span class="lab">Age</span><span class="v r">{{ b.age }}</span></div>
-      <div class="row"><span class="v l">{{ a.height }}</span><span class="lab">Height</span><span class="v r">{{ b.height }}</span></div>
-      <div class="row"><span class="v l">{{ a.reach }}</span><span class="lab">Reach</span><span class="v r">{{ b.reach }}</span></div>
-      <div class="row">
-        <div class="pills l">
-          <span v-for="(r, j) in a.last5" :key="j" class="pill" :class="pillClass[r[0]] || 'n'">{{ r }}</span>
-          <span v-if="!a.last5.length" class="muted">—</span>
-        </div>
-        <span class="lab">Last 5</span>
-        <div class="pills r">
-          <span v-for="(r, j) in b.last5" :key="j" class="pill" :class="pillClass[r[0]] || 'n'">{{ r }}</span>
-          <span v-if="!b.last5.length" class="muted">—</span>
-        </div>
-      </div>
+    <div v-if="ages" class="fig">
+      <span class="fig__v fig__v--red">{{ ages.r }}</span>
+      <span class="tt__lab">Age</span>
+      <span class="fig__v fig__v--blue">{{ ages.b }}</span>
     </div>
   </div>
 </template>
 
 <style scoped>
-.bill {
-  border: 1px solid var(--line);
-  background:
-    repeating-linear-gradient(0deg, #101015, #101015 2px, #0d0d12 2px, #0d0d12 4px);
-  border-radius: 6px;
-  padding: 26px 24px 28px;
-  margin: 24px 0;
+.tape { margin: 26px auto 0; max-width: 600px; display: grid; gap: 13px; }
+.tape__head {
+  font-family: var(--font-cond); font-weight: 600; font-size: .72rem; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--muted); text-align: center; margin: 0 0 2px;
 }
-.names { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
-.fighter { text-align: center; }
-.corner {
-  font-family: var(--font-cond); font-weight: 600; font-size: .68rem;
-  letter-spacing: .22em; text-transform: uppercase;
-}
-.corner.red { color: var(--red); }
-.corner.blue { color: var(--blue); }
-.fname {
-  font-family: var(--font-display); font-weight: 400; text-transform: uppercase;
-  font-size: 2.2rem; line-height: .96; margin: 8px 0 6px;
-}
-.fname a { color: inherit; text-decoration: none; }
-.fname a:hover { color: var(--gold); }
-.rec { font-family: var(--font-cond); font-weight: 600; font-size: 1.05rem; color: var(--gold); letter-spacing: .02em; }
-.vs { font-family: var(--font-display); font-size: 1.5rem; color: var(--ink); opacity: .45; }
+.tt { display: grid; grid-template-columns: 1fr 92px 1fr; align-items: center; gap: 12px; }
+.tt__lab { font-family: var(--font-cond); font-weight: 500; font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); text-align: center; }
+.tt__side { display: flex; align-items: center; gap: 10px; }
+.tt__side--red { justify-content: flex-end; }
+.tt__side--blue { justify-content: flex-start; flex-direction: row-reverse; }
+.tt__val { font-family: var(--font-cond); font-weight: 600; font-size: 1.02rem; font-variant-numeric: tabular-nums; min-width: 46px; }
+.tt__side--red .tt__val { text-align: right; }
+.tt__side--blue .tt__val { text-align: left; }
+.tt__val.is-edge { color: var(--gold); }
+.tt__track { flex: 1; height: 9px; border-radius: 4px; background: #1b1a20; display: flex; overflow: hidden; }
+.tt__side--red .tt__track { justify-content: flex-end; }
+.tt__fill { height: 100%; border-radius: 4px; transition: width .9s cubic-bezier(.22, .61, .36, 1); }
+.tt__fill--red { background: linear-gradient(90deg, var(--red), var(--red-bright)); }
+.tt__fill--blue { background: linear-gradient(90deg, #7ba6ef, var(--blue)); }
 
-.tape { margin-top: 24px; border-top: 1px solid var(--line); }
-.row {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-  border-bottom: 1px solid var(--line); padding: 9px 0;
-}
-.v { font-family: var(--font-cond); font-weight: 600; font-size: 1.1rem; }
-.v.l { text-align: right; padding-right: 18px; }
-.v.r { text-align: left; padding-left: 18px; }
-.lab {
-  font-family: var(--font-cond); font-weight: 500; font-size: .66rem;
-  letter-spacing: .2em; text-transform: uppercase; color: var(--muted); text-align: center;
-}
-.pills { display: flex; gap: 4px; flex-wrap: wrap; min-width: 0; }
-.pills.l { justify-content: flex-end; padding-right: 18px; }
-.pills.r { justify-content: flex-start; padding-left: 18px; }
-.pill { font-family: var(--font-cond); font-size: .64rem; font-weight: 600; padding: 2px 6px; color: #fff; }
-.pill.w { background: var(--win); }
-.pill.l { background: var(--loss); }
-.pill.d { background: var(--draw); }
-.pill.n { background: #444; }
-.muted { color: var(--muted); }
+.fig { display: grid; grid-template-columns: 1fr 92px 1fr; align-items: center; gap: 12px; }
+.fig__v { font-family: var(--font-cond); font-weight: 600; font-size: 1.02rem; }
+.fig__v--red { text-align: right; }
+.fig__v--blue { text-align: left; }
+.fig__v small { display: block; font-size: .56rem; letter-spacing: .12em; color: var(--gold); text-transform: uppercase; }
 
-/* narrow screens: tighter tape so the last-5 pills never force the page wide */
-@media (max-width: 560px) {
-  .bill { padding: 20px 12px 22px; }
-  .fname { font-size: 1.45rem; }
-  .rec { font-size: .92rem; }
-  .v { font-size: .95rem; }
-  .v.l { padding-right: 10px; }
-  .v.r { padding-left: 10px; }
-  .lab { font-size: .58rem; letter-spacing: .12em; }
-  .pills.l { padding-right: 8px; }
-  .pills.r { padding-left: 8px; }
-  .pill { font-size: .56rem; padding: 2px 4px; }
-}
+@media (prefers-reduced-motion: reduce) { .tt__fill { transition: none; } }
 </style>

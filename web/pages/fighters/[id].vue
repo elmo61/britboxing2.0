@@ -30,7 +30,6 @@ useHead({ title: `${f.name} | BritBoxing` })
 <template>
   <div class="wrap">
     <NuxtLink to="/fighters" class="back">← All fighters</NuxtLink>
-    <div class="masthead"><BritLogo /></div>
     <div class="kicker">Fighter</div>
     <h1 class="bigname">{{ f.name }}</h1>
 

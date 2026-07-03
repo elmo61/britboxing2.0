@@ -14,6 +14,13 @@ const wikiSources = [
   { label: `${f.bout.fighter_b} (Wikipedia)`, url: f.fighterB._meta.source },
 ]
 
+function record(s: any): string {
+  const r = s?.record ?? {}
+  if (r.wins == null) return '—'
+  const base = `${r.wins}-${r.losses ?? 0}-${r.draws ?? 0}`
+  return r.winsKo != null ? `${base} · ${r.winsKo} KO` : base
+}
+
 useHead(() => ({
   title: `${f.article.title} | BritBoxing`,
   meta: [
@@ -29,30 +36,49 @@ useHead(() => ({
   <div class="wrap" v-if="f">
     <NuxtLink to="/" class="back">← All previews</NuxtLink>
 
-    <div class="masthead"><BritLogo /></div>
-    <div class="kicker">
-      Fight preview<template v-if="f.bout.weightClass"> · {{ f.bout.weightClass }}</template>
-      <span class="status" :class="`status--${f.bout.status}`">{{ f.bout.status }}</span>
-    </div>
-    <h1>{{ f.article.title }}</h1>
-    <div class="meta-dates">
-      <template v-if="formatEventDate(f.bout.eventDate)">Fight date <strong>{{ formatEventDate(f.bout.eventDate) }}</strong></template>
-      <template v-if="formatEventDate(f.bout.eventDate) && formatPostedAt(f.article.published_at)"> · </template>
-      <template v-if="formatPostedAt(f.article.published_at)">Posted {{ formatPostedAt(f.article.published_at) }}</template>
-    </div>
-    <p class="summary">{{ f.article.summary }}</p>
-    <div class="announce">
-      Announced via {{ f.bout.source }}: &ldquo;{{ f.bout.headline }}&rdquo;
+    <div class="poster-band">
+      <img class="poster-fighter poster-fighter--l" :src="'/motifs/boxer2.png'" alt="" aria-hidden="true">
+      <img class="poster-fighter poster-fighter--r" :src="'/motifs/boxer.png'" alt="" aria-hidden="true">
+      <div class="kicker" style="text-align:center">
+        Fight preview<template v-if="f.bout.weightClass"> · {{ f.bout.weightClass }}</template>
+      </div>
+      <div class="poster">
+        <div class="corner corner--red">
+          <span class="corner__tag">Red corner</span>
+          <h1 class="pname">
+            <NuxtLink v-if="f.bout.fighterAId" :to="`/fighters/${f.bout.fighterAId}`">{{ f.bout.fighter_a }}</NuxtLink>
+            <template v-else>{{ f.bout.fighter_a }}</template>
+          </h1>
+          <p class="prec">{{ record(f.fighterA) }}</p>
+        </div>
+        <div class="pvs"><span>VS</span></div>
+        <div class="corner corner--blue">
+          <span class="corner__tag">Blue corner</span>
+          <h1 class="pname">
+            <NuxtLink v-if="f.bout.fighterBId" :to="`/fighters/${f.bout.fighterBId}`">{{ f.bout.fighter_b }}</NuxtLink>
+            <template v-else>{{ f.bout.fighter_b }}</template>
+          </h1>
+          <p class="prec">{{ record(f.fighterB) }}</p>
+        </div>
+      </div>
+
+      <div class="billstrip">
+        <span v-if="formatEventDate(f.bout.eventDate)"><strong>{{ formatEventDate(f.bout.eventDate) }}</strong></span>
+        <span class="status" :class="`status--${f.bout.status}`">{{ f.bout.status }}</span>
+      </div>
+
+      <FightCard :fighter-a="f.fighterA" :fighter-b="f.fighterB" />
     </div>
 
-    <FightCard
-      :fighter-a="f.fighterA"
-      :fighter-b="f.fighterB"
-      :href-a="f.bout.fighterAId ? `/fighters/${f.bout.fighterAId}` : undefined"
-      :href-b="f.bout.fighterBId ? `/fighters/${f.bout.fighterBId}` : undefined"
-    />
-
-    <article v-html="f.article.body" />
+    <article>
+      <h2 class="article-title">{{ f.article.title }}</h2>
+      <div class="meta-dates">
+        <template v-if="formatPostedAt(f.article.published_at)">Posted {{ formatPostedAt(f.article.published_at) }}</template>
+      </div>
+      <p class="summary">{{ f.article.summary }}</p>
+      <div class="announce">Announced via {{ f.bout.source }}: &ldquo;{{ f.bout.headline }}&rdquo;</div>
+      <div v-html="f.article.body" />
+    </article>
 
     <div class="tags">
       <span v-for="(t, i) in f.article.tags" :key="i">{{ t }}</span>
@@ -70,3 +96,10 @@ useHead(() => ({
     </footer>
   </div>
 </template>
+
+<style scoped>
+.article-title {
+  font-family: var(--font-cond); font-weight: 600; line-height: 1.1;
+  font-size: 1.9rem; margin: 34px 0 6px;
+}
+</style>

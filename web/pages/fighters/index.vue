@@ -2,8 +2,22 @@
 const { data: fighters } = await useFetch('/api/fighters')
 useHead({ title: 'Fighters | BritBoxing' })
 
-const search = ref('')
-const division = ref('')
+const route = useRoute()
+const router = useRouter()
+
+// Filter state lives in the URL query (?q=&division=) so a filtered view is
+// shareable and survives a refresh / back button.
+const search = ref((route.query.q as string) ?? '')
+const division = ref((route.query.division as string) ?? '')
+
+watch([search, division], ([q, d]) => {
+  router.replace({
+    query: {
+      ...(q ? { q } : {}),
+      ...(d ? { division: d } : {}),
+    },
+  })
+})
 
 // Weight classes, lightest to heaviest, for the filter dropdown — built from
 // the divisions the roster actually spans so it never shows empty options.
@@ -38,8 +52,6 @@ const filtered = computed(() => (fighters.value ?? []).filter((f: any) => {
 
 <template>
   <div class="wrap wrap--wide">
-    <NuxtLink to="/" class="back">← Home</NuxtLink>
-    <div class="masthead"><BritLogo /></div>
     <h1>Fighters</h1>
 
     <div class="filters">
