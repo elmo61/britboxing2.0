@@ -46,4 +46,9 @@ defineProps<{
   font-family: var(--font-cond); font-size: .72rem; letter-spacing: .06em;
   text-transform: uppercase; color: var(--muted); white-space: nowrap;
 }
+/* mobile: put status + date under the headline so they don't squeeze it */
+@media (max-width: 560px) {
+  .coverage__row { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .coverage__meta { gap: 8px; }
+}
 </style>
