@@ -65,16 +65,13 @@ export async function getFight(slug: string) {
   }
 }
 
-/** Scheduled bouts: a confirmed future date, soonest first. */
+/** Scheduled bouts: dated fights soonest-first, then undated ("TBC") below. */
 export async function getSchedule() {
   const sb = useSupabase()
-  const today = new Date().toISOString().slice(0, 10)
   const { data, error } = await sb
     .from('bouts')
     .select('slug, status, weight_class, event_date, fighter_a_snapshot, fighter_b_snapshot')
-    .gte('event_date', today)
-    .neq('status', 'cancelled')
-    .order('event_date', { ascending: true })
+    .order('event_date', { ascending: true, nullsFirst: false })
   if (error) throw createError({ statusCode: 502, statusMessage: error.message })
   return (data ?? []).map((b: any) => ({
     slug: b.slug,

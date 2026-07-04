@@ -260,6 +260,15 @@ footer.attribution a { color: var(--muted); }
 .mainnav a.is-active { color: var(--ink); }
 .mainnav a.is-active::after { content: ""; display: block; height: 2px; margin-top: 5px; background: var(--gold); border-radius: 2px; }
 
+/* mobile: 3 nav items don't fit beside the wordmark — stack them under it
+   and drop the tagline to keep the bar compact */
+@media (max-width: 560px) {
+  .site-head__inner { flex-direction: column; align-items: stretch; gap: 8px; }
+  .brand__tagline { display: none; }
+  .mainnav { gap: 4px; }
+  .mainnav a { padding: 6px 12px 6px 0; }
+}
+
 .site-foot { border-top: 1px solid var(--line); margin-top: 44px; }
 .site-foot__inner {
   max-width: var(--maxw); margin: 0 auto; padding: 30px clamp(16px, 5vw, 48px);

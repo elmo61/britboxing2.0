@@ -25,7 +25,7 @@ defineProps<{
 </template>
 
 <style scoped>
-.coverage { margin: clamp(30px, 5vw, 44px) auto 0; max-width: 660px; }
+.coverage { margin: clamp(30px, 5vw, 44px) 0 0; }
 .coverage__head {
   font-family: var(--font-cond); font-weight: 600; font-size: .78rem; letter-spacing: .18em;
   text-transform: uppercase; color: var(--muted); margin: 0 0 10px; padding-bottom: 10px;

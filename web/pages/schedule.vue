@@ -11,12 +11,12 @@ function names(matchup: string): [string, string] {
 <template>
   <div class="wrap wrap--wide">
     <h1>Schedule</h1>
-    <p class="lede">Confirmed fights with a date, soonest first.</p>
+    <p class="lede">Upcoming fights by date; fights without a confirmed date yet are listed below.</p>
 
     <ul v-if="bouts?.length" class="sched">
       <li v-for="b in bouts" :key="b.slug" class="sched__row">
         <NuxtLink :to="b.href" class="sched__link">
-          <span class="sched__date">{{ formatEventDate(b.eventDate) }}</span>
+          <span class="sched__date" :class="{ 'sched__date--tbc': !b.eventDate }">{{ formatEventDate(b.eventDate) ?? 'TBC' }}</span>
           <span class="sched__matchup">{{ names(b.matchup)[0] }} <span class="sched__vs">v</span> {{ names(b.matchup)[1] }}</span>
           <span class="sched__meta">
             <span v-if="b.division" class="sched__div">{{ b.division }}</span>
@@ -42,6 +42,7 @@ function names(matchup: string): [string, string] {
   font-family: var(--font-cond); font-weight: 600; font-size: .82rem; letter-spacing: .06em;
   text-transform: uppercase; color: var(--gold); font-variant-numeric: tabular-nums;
 }
+.sched__date--tbc { color: var(--muted); }
 .sched__matchup { font-family: var(--font-display); text-transform: uppercase; font-size: 1.35rem; line-height: 1; }
 .sched__vs { color: var(--muted); font-family: var(--font-cond); font-weight: 600; font-size: .7em; }
 .sched__meta { display: inline-flex; align-items: center; gap: 10px; }
