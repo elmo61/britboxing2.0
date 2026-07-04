@@ -76,6 +76,7 @@ services.AddHttpClient<WikipediaSnapshotService>();
 services.AddHttpClient<ArticleGenerator>();
 services.AddTransient<FighterStore>();
 services.AddTransient<BoutProcessor>();
+services.AddHttpClient<FightDateEnricher>();
 services.AddHttpClient<SiteDeployTrigger>();
 
 services.AddSingleton<IFightDeduplicator>(_ => new FightDeduplicator());
@@ -94,6 +95,17 @@ if (!await seenStore.CheckConnectionAsync())
         "db/schema.sql + db/policies.sql have been applied. Aborting — " +
         "nothing downstream can be persisted without this.");
     Environment.Exit(1);
+    return;
+}
+
+// Separate job: `enrich-dates` fills missing fight dates via web search,
+// independent of the feed run (run it on its own, lower-frequency schedule).
+if (args.Contains("enrich-dates"))
+{
+    // Optional numeric arg caps how many bouts to process (for a cheap smoke
+    // test): `enrich-dates 3`. No arg => all dateless confirmed bouts.
+    var limit = args.Select(x => int.TryParse(x, out var n) ? n : 0).FirstOrDefault(n => n > 0);
+    await RunDateEnrichmentAsync(provider, limit == 0 ? int.MaxValue : limit);
     return;
 }
 
@@ -217,6 +229,63 @@ foreach (var item in ordered)
     Console.WriteLine($"  Date: {item.EventDate?.ToString("d") ?? "?"}  Venue: {item.Venue ?? "?"}  City: {item.City ?? "?"}");
     Console.WriteLine($"  {item.SourceUrl}");
     Console.WriteLine();
+}
+
+// Fills missing fight dates for still-live bouts via web-search grounding.
+// Web-searches each dateless confirmed bout for (a) a source-backed date and
+// (b) whether sources actually treat it as officially confirmed. A date is only
+// stored when the model cited a source (see FightDateEnricher). When no date is
+// found AND sources say the fight is only rumoured, the bout is demoted to
+// 'rumoured' — this doubles as a cleanup pass for the over-eager status
+// classifier. A confirmed-but-undated fight (or an ambiguous one) is left alone.
+static async Task RunDateEnrichmentAsync(IServiceProvider provider, int limit)
+{
+    var supabase = provider.GetRequiredService<SupabaseClient>();
+    var enricher = provider.GetRequiredService<FightDateEnricher>();
+
+    // Only confirmed fights — a specific date rarely exists before a fight is
+    // confirmed, so searching rumoured bouts wastes web-search calls.
+    var bouts = await supabase.SelectAsync("bouts",
+        "select=slug,weight_class,fighter_a_snapshot,fighter_b_snapshot&event_date=is.null&status=eq.confirmed");
+
+    int checkedCount = 0, found = 0, demoted = 0;
+    foreach (var b in bouts.OfType<System.Text.Json.Nodes.JsonObject>())
+    {
+        if (checkedCount >= limit) break;
+        var a = b["fighter_a_snapshot"]?["_meta"]?["name"]?.GetValue<string>();
+        var c = b["fighter_b_snapshot"]?["_meta"]?["name"]?.GetValue<string>();
+        if (a is null || c is null) continue;
+        checkedCount++;
+
+        var slug = b["slug"]!.GetValue<string>();
+        var res = await enricher.FindDateAsync(a, c, b["weight_class"]?.GetValue<string>());
+        if (res is null)
+        {
+            Console.WriteLine($"  {slug}: (no result — search/parse failed)");
+            continue;
+        }
+
+        if (res.Date is not null)
+        {
+            await supabase.UpdateAsync("bouts", $"slug=eq.{Uri.EscapeDataString(slug)}",
+                new System.Text.Json.Nodes.JsonObject { ["event_date"] = res.Date });
+            found++;
+            Console.WriteLine($"  {slug}: DATE {res.Date} ({res.Confidence}) — {res.SourceUrl}");
+        }
+        else if (res.Status == "rumoured")
+        {
+            await supabase.UpdateAsync("bouts", $"slug=eq.{Uri.EscapeDataString(slug)}",
+                new System.Text.Json.Nodes.JsonObject { ["status"] = "rumoured" });
+            demoted++;
+            Console.WriteLine($"  {slug}: no date, sources say rumoured -> demoted to rumoured");
+        }
+        else
+        {
+            Console.WriteLine($"  {slug}: no date, status left as confirmed ({res.Status})");
+        }
+    }
+    Console.WriteLine($"Date enrichment: checked {checkedCount} dateless confirmed bouts, set {found} dates, demoted {demoted} to rumoured.");
+    if (found > 0 || demoted > 0) await provider.GetRequiredService<SiteDeployTrigger>().TriggerAsync();
 }
 
 // Loads backend/.env into the process environment, project-scoped (never a

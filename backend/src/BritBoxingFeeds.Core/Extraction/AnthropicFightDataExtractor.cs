@@ -129,7 +129,7 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
         {
           "fighter1": string | null,
           "fighter2": string | null,
-          "eventDate": string | null,   // ISO 8601 date e.g. "2026-07-20", null if no specific date given
+          "eventDate": string | null,   // ISO 8601 date e.g. "2026-07-20". Resolve relative dates ("this Saturday", "next month") against the published date below. Null if no specific date is stated.
           "venue": string | null,
           "city": string | null,
           "weightClass": string | null,
@@ -140,6 +140,10 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
         }
         """);
         sb.AppendLine();
+        if (raw.PublishedAt is { } pub)
+        {
+            sb.AppendLine($"Published: {pub:yyyy-MM-dd} (use this to resolve any relative dates)");
+        }
         sb.AppendLine($"Headline: {raw.RawHeadline}");
         if (!string.IsNullOrWhiteSpace(raw.ArticleBody))
         {
