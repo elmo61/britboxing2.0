@@ -61,6 +61,8 @@ create table if not exists bouts (
 create table if not exists articles (
     id           bigint generated always as identity primary key,
     bout_slug    text not null references bouts(slug) on delete cascade,
+    slug         text not null,                  -- title-derived, unique within the bout (nested URL /fights/{bout}/{slug})
+    status       text,                           -- fight status when this article was written (rumoured/confirmed/cancelled)
     title        text not null,
     summary      text,
     body         text not null,                 -- HTML
@@ -70,6 +72,7 @@ create table if not exists articles (
     published_at timestamptz not null default now()
 );
 create index if not exists idx_articles_bout on articles(bout_slug);
+create unique index if not exists idx_articles_bout_slug_uniq on articles(bout_slug, slug);
 
 -- Idempotent upgrade for databases created before the columns existed.
 alter table fighters add column if not exists nationality text;

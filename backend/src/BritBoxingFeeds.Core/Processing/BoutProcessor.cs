@@ -215,11 +215,14 @@ public class BoutProcessor
                 var sources = art["sources"]?.DeepClone().AsArray() ?? [];
                 var already = !string.IsNullOrEmpty(item.SourceUrl)
                     && sources.Any(s => s?["url"]?.GetValue<string>() == item.SourceUrl);
-                if (!already)
+                var patch = new JsonObject();
+                if (!already) { sources.Add(sourceEntry.DeepClone()); patch["sources"] = sources; }
+                // A fight can firm up within the window (rumoured -> confirmed).
+                if (item.FightStatus is { } st) patch["status"] = st;
+                if (patch.Count > 0)
                 {
-                    sources.Add(sourceEntry.DeepClone());
                     var id = art["id"]!.GetValue<long>();
-                    await _supabase.UpdateAsync("articles", $"id=eq.{id}", new JsonObject { ["sources"] = sources }, ct);
+                    await _supabase.UpdateAsync("articles", $"id=eq.{id}", patch, ct);
                 }
                 return "appended";
             }
@@ -228,9 +231,12 @@ public class BoutProcessor
         var article = await _articles.GenerateAsync(bout, snapA, snapB, ct);
         if (article is null) return "failed";
 
+        var title = article["title"]?.GetValue<string>() ?? "Preview";
         await _supabase.InsertAsync("articles", new JsonObject
         {
             ["bout_slug"] = boutSlug,
+            ["slug"] = await UniqueArticleSlugAsync(boutSlug, title, ct),
+            ["status"] = item.FightStatus ?? (item.EventDate is not null ? "confirmed" : "rumoured"),
             ["title"] = article["title"]?.DeepClone(),
             ["summary"] = article["summary"]?.DeepClone(),
             ["body"] = article["body"]?.DeepClone(),
@@ -242,6 +248,24 @@ public class BoutProcessor
         return "created";
     }
 
+    private static string Slugify(string s)
+    {
+        var kebab = Regex.Replace(s.ToLowerInvariant(), @"[^a-z0-9]+", "-").Trim('-');
+        if (kebab.Length == 0) return "article";
+        return kebab.Length > 90 ? kebab[..90].Trim('-') : kebab;
+    }
+
+    /// <summary>A title-derived article slug, unique within the bout (nested URL /fights/{bout}/{slug}).</summary>
+    private async Task<string> UniqueArticleSlugAsync(string boutSlug, string title, CancellationToken ct)
+    {
+        var baseSlug = Slugify(title);
+        var taken = (await _supabase.SelectAsync("articles", $"select=slug&bout_slug=eq.{Uri.EscapeDataString(boutSlug)}", ct))
+            .Select(a => a?["slug"]?.GetValue<string>()).Where(s => s is not null).ToHashSet();
+        var slug = baseSlug;
+        for (var n = 2; taken.Contains(slug); n++) slug = $"{baseSlug}-{n}";
+        return slug;
+    }
+
     /// <summary>
     /// Generates an article for any bout that has none (e.g. generation failed
     /// on the run that created the bout). Uses the bout's frozen snapshots.
@@ -249,7 +273,7 @@ public class BoutProcessor
     public async Task<int> RetryMissingArticlesAsync(CancellationToken ct = default)
     {
         var bouts = await _supabase.SelectAsync("bouts",
-            "select=slug,weight_class,event_date,fighter_a_snapshot,fighter_b_snapshot", ct);
+            "select=slug,status,weight_class,event_date,fighter_a_snapshot,fighter_b_snapshot", ct);
         var withArticles = (await _supabase.SelectAsync("articles", "select=bout_slug", ct))
             .Select(a => a?["bout_slug"]?.GetValue<string>())
             .ToHashSet();
@@ -277,9 +301,12 @@ public class BoutProcessor
                 continue;
             }
 
+            var title = article["title"]?.GetValue<string>() ?? "Preview";
             await _supabase.InsertAsync("articles", new JsonObject
             {
                 ["bout_slug"] = slug,
+                ["slug"] = await UniqueArticleSlugAsync(slug, title, ct),
+                ["status"] = row["status"]?.DeepClone(),
                 ["title"] = article["title"]?.DeepClone(),
                 ["summary"] = article["summary"]?.DeepClone(),
                 ["body"] = article["body"]?.DeepClone(),

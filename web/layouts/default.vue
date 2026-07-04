@@ -4,7 +4,8 @@
 const route = useRoute()
 const collapsed = ref(false)
 
-const previewsActive = computed(() => route.path === '/' || route.path.startsWith('/fights'))
+const latestActive = computed(() => route.path === '/' || route.path.startsWith('/fights'))
+const scheduleActive = computed(() => route.path.startsWith('/schedule'))
 const fightersActive = computed(() => route.path.startsWith('/fighters'))
 
 let onScroll: (() => void) | null = null
@@ -33,7 +34,8 @@ onBeforeUnmount(() => { if (onScroll) window.removeEventListener('scroll', onScr
           <p class="brand__tagline">The big fights, previewed by the numbers</p>
         </div>
         <nav class="mainnav">
-          <NuxtLink to="/" :class="{ 'is-active': previewsActive }">Previews</NuxtLink>
+          <NuxtLink to="/" :class="{ 'is-active': latestActive }">Latest</NuxtLink>
+          <NuxtLink to="/schedule" :class="{ 'is-active': scheduleActive }">Schedule</NuxtLink>
           <NuxtLink to="/fighters" :class="{ 'is-active': fightersActive }">Fighters</NuxtLink>
         </nav>
       </div>

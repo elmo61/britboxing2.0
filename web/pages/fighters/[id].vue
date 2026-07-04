@@ -9,6 +9,7 @@ if (error.value || !data.value) {
 
 const f = data.value.fighter
 const bouts = data.value.bouts
+const articles = data.value.articles ?? []
 const rec = f.latest?.record ?? {}
 const phys = f.latest?.physical ?? {}
 
@@ -49,12 +50,22 @@ useHead({ title: `${f.name} | BritBoxing` })
     <h2>Fights</h2>
     <ul class="bouts">
       <li v-for="b in bouts" :key="b.slug">
-        <NuxtLink :to="`/fights/${b.slug}`">vs {{ b.opponentName }}</NuxtLink>
+        <NuxtLink :to="b.href">vs {{ b.opponentName }}</NuxtLink>
         <span v-if="b.division" class="div">{{ b.division }}</span>
         <span class="status" :class="`status--${b.status}`">{{ b.status }}</span>
       </li>
-      <li v-if="!bouts.length" class="muted">No previews yet.</li>
+      <li v-if="!bouts.length" class="muted">No fights yet.</li>
     </ul>
+
+    <template v-if="articles.length">
+      <h2>Articles</h2>
+      <ul class="bouts">
+        <li v-for="a in articles" :key="a.href">
+          <NuxtLink :to="a.href">{{ a.title }}</NuxtLink>
+          <span v-if="formatPostedAt(a.postedAt)" class="div">{{ formatPostedAt(a.postedAt) }}</span>
+        </li>
+      </ul>
+    </template>
 
     <footer class="attribution" v-if="f.hasWikipedia && f.latest?._meta?.source">
       <p>Record and biographical data derived from
