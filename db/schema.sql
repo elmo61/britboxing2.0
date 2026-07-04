@@ -56,15 +56,20 @@ create table if not exists bouts (
     created_at         timestamptz not null default now()
 );
 
+-- One bout can carry MANY articles: a burst of coverage in one window rolls
+-- into a single multi-source article; a fresh burst weeks later is a new one.
 create table if not exists articles (
-    slug         text primary key references bouts(slug) on delete cascade,
+    id           bigint generated always as identity primary key,
+    bout_slug    text not null references bouts(slug) on delete cascade,
     title        text not null,
     summary      text,
     body         text not null,                 -- HTML
     tags         text[],
     ai_generated boolean not null default true,
+    sources      jsonb,                          -- [{source, url, headline, seen_at}] feeding this article
     published_at timestamptz not null default now()
 );
+create index if not exists idx_articles_bout on articles(bout_slug);
 
 -- Idempotent upgrade for databases created before the columns existed.
 alter table fighters add column if not exists nationality text;

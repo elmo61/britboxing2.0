@@ -50,12 +50,17 @@ public class BoutProcessor
         _logger = logger;
     }
 
-    public record ProcessSummary(int Considered, int Ignored, int BoutsCreated, int ArticlesCreated, int AlreadyExisted);
+    public record ProcessSummary(int Considered, int Ignored, int BoutsCreated, int ArticlesCreated, int ArticlesAppended, int AlreadyExisted);
+
+    // A fight announced now shows up across many feeds within days; those all
+    // roll into ONE article (citing multiple sources). A fresh item after this
+    // window opens a NEW article on the same bout.
+    private static readonly TimeSpan ArticleWindow = TimeSpan.FromDays(7);
 
     /// <summary>Candidates carry the seen-row key they were loaded from (null for items found this run) so status updates hit the right row.</summary>
     public async Task<ProcessSummary> ProcessAsync(IReadOnlyList<(FightAnnouncement Item, string? SourceKey)> candidates, CancellationToken ct = default)
     {
-        int ignored = 0, boutsCreated = 0, articlesCreated = 0, alreadyExisted = 0;
+        int ignored = 0, boutsCreated = 0, articlesCreated = 0, articlesAppended = 0, alreadyExisted = 0;
 
         foreach (var (item, sourceKey) in candidates)
         {
@@ -116,26 +121,14 @@ public class BoutProcessor
                 continue;
             }
             var slug = $"{fidA}-vs-{fidB}";
-
             // The same matchup may already exist under the reversed fighter
             // order (sources name the fighters in either order) — check both.
             var reversedSlug = $"{fidB}-vs-{fidA}";
             var existing = await _supabase.SelectAsync("bouts",
-                $"select=slug&slug=in.({Uri.EscapeDataString($"{slug},{reversedSlug}")})", ct);
-            if (existing.Count > 0)
-            {
-                slug = existing[0]!["slug"]!.GetValue<string>();
-                var existingArticle = await _supabase.SelectAsync("articles", $"select=slug&slug=eq.{Uri.EscapeDataString(slug)}", ct);
-                await _seenStore.SetStatusAsync(item,
-                    existingArticle.Count > 0 ? "article_created" : "bout_created",
-                    boutSlug: slug, sourceKey: sourceKey, ct: ct);
-                _logger.LogInformation("Bout {Slug} already exists, linked and skipped", slug);
-                alreadyExisted++;
-                continue;
-            }
+                $"select=slug,event_date&slug=in.({Uri.EscapeDataString($"{slug},{reversedSlug}")})", ct);
 
-            // The bout context handed to the prompt builder (camelCase, same
-            // shape as the Python pipeline's bout dict).
+            // Article-generation context — names + stats from the snapshots we
+            // just built. Used whether the bout is new or already exists.
             var bout = new JsonObject
             {
                 ["fighter_a"] = snapA["_meta"]!["name"]!.GetValue<string>(),
@@ -144,82 +137,128 @@ public class BoutProcessor
                 ["fighterBId"] = fidB,
                 ["weightClass"] = WikipediaSnapshotService.BoutWeightClass(snapA, snapB) ?? item.WeightClass,
                 ["eventDate"] = item.EventDate?.ToString("yyyy-MM-dd"),
-                ["announcedAt"] = item.PublishedAt?.ToString("o"),
                 ["headline"] = item.RawHeadline,
                 ["source"] = item.MergedFromSources is { Count: > 0 } merged ? string.Join(", ", merged) : item.SourceName,
                 ["link"] = item.SourceUrl,
             };
 
-            var boutRow = new JsonObject
+            string boutSlug;
+            if (existing.Count > 0)
             {
-                ["slug"] = slug,
-                ["fighter_a_id"] = fidA,
-                ["fighter_b_id"] = fidB,
-                // No LLM verdict -> a dated announcement reads as confirmed, an
-                // undated one as still-in-the-works.
-                ["status"] = item.FightStatus ?? (item.EventDate is not null ? "confirmed" : "rumoured"),
-                ["weight_class"] = bout["weightClass"]?.DeepClone(),
-                ["event_date"] = bout["eventDate"]?.DeepClone(),
-                ["announced_at"] = bout["announcedAt"]?.DeepClone(),
-                ["headline"] = item.RawHeadline,
-                ["source"] = bout["source"]?.DeepClone(),
-                ["source_url"] = item.SourceUrl,
-                // FROZEN at announcement time — never rewritten when a fighter updates.
-                ["fighter_a_snapshot"] = snapA.DeepClone(),
-                ["fighter_b_snapshot"] = snapB.DeepClone(),
-                ["prompt"] = ArticleGenerator.BuildPromptRecord(bout, snapA, snapB),
-            };
-            await _supabase.UpsertAsync("bouts", [boutRow], "slug", ct);
-            await _seenStore.SetStatusAsync(item, "bout_created", boutSlug: slug, sourceKey: sourceKey, ct: ct);
-            boutsCreated++;
-            _logger.LogInformation("Created bout {Slug}", slug);
-
-            // ---- Article ------------------------------------------------
-            var article = await _articles.GenerateAsync(bout, snapA, snapB, ct);
-            if (article is null)
+                boutSlug = existing[0]!["slug"]!.GetValue<string>();
+                alreadyExisted++;
+                // Backfill a date if we now have one and the bout was dateless.
+                if (item.EventDate is { } d && existing[0]!["event_date"] is null)
+                {
+                    await _supabase.UpdateAsync("bouts", $"slug=eq.{Uri.EscapeDataString(boutSlug)}",
+                        new JsonObject { ["event_date"] = d.ToString("yyyy-MM-dd"), ["status"] = item.FightStatus ?? "confirmed" }, ct);
+                }
+            }
+            else
             {
-                // Left at bout_created — a later run can regenerate from bouts.prompt.
-                _logger.LogWarning("Article generation failed for {Slug}; bout saved without article", slug);
-                continue;
+                boutSlug = slug;
+                await _supabase.UpsertAsync("bouts", [new JsonObject
+                {
+                    ["slug"] = slug,
+                    ["fighter_a_id"] = fidA,
+                    ["fighter_b_id"] = fidB,
+                    // No LLM verdict -> dated announcement reads confirmed, undated rumoured.
+                    ["status"] = item.FightStatus ?? (item.EventDate is not null ? "confirmed" : "rumoured"),
+                    ["weight_class"] = bout["weightClass"]?.DeepClone(),
+                    ["event_date"] = bout["eventDate"]?.DeepClone(),
+                    // FROZEN at announcement time — never rewritten when a fighter updates.
+                    ["fighter_a_snapshot"] = snapA.DeepClone(),
+                    ["fighter_b_snapshot"] = snapB.DeepClone(),
+                }], "slug", ct);
+                boutsCreated++;
+                _logger.LogInformation("Created bout {Slug}", slug);
             }
 
-            var articleRow = new JsonObject
-            {
-                // slug must equal the bout slug (FK) — the model's suggested slug is ignored.
-                ["slug"] = slug,
-                ["title"] = article["title"]?.DeepClone(),
-                ["summary"] = article["summary"]?.DeepClone(),
-                ["body"] = article["body"]?.DeepClone(),
-                ["tags"] = article["tags"]?.DeepClone(),
-                ["ai_generated"] = true,
-            };
-            await _supabase.UpsertAsync("articles", [articleRow], "slug", ct);
-            await _seenStore.SetStatusAsync(item, "article_created", boutSlug: slug, sourceKey: sourceKey, ct: ct);
-            articlesCreated++;
-            _logger.LogInformation("Published article for {Slug}", slug);
+            // ---- Article (windowed: one article per burst of coverage) ------
+            var outcome = await UpsertArticleForBoutAsync(boutSlug, bout, snapA, snapB, item, ct);
+            if (outcome == "created") { articlesCreated++; _logger.LogInformation("New article for {Slug}", boutSlug); }
+            else if (outcome == "appended") { articlesAppended++; _logger.LogInformation("Added source to open article for {Slug}", boutSlug); }
+            else { _logger.LogWarning("Article generation failed for {Slug}", boutSlug); }
+
+            await _seenStore.SetStatusAsync(item, outcome == "failed" ? "bout_created" : "article_created",
+                boutSlug: boutSlug, sourceKey: sourceKey, ct: ct);
         }
 
-        return new ProcessSummary(candidates.Count, ignored, boutsCreated, articlesCreated, alreadyExisted);
+        return new ProcessSummary(candidates.Count, ignored, boutsCreated, articlesCreated, articlesAppended, alreadyExisted);
     }
 
     /// <summary>
-    /// Regenerate articles for bouts left at bout_created by an earlier run
-    /// (article generation failed). Rebuilds the bout context from the bouts
-    /// row itself, so no re-extraction or Wikipedia refetch is needed.
+    /// Adds this feed item's coverage to the bout. If the bout has an article
+    /// whose window is still open (published within ArticleWindow), the item
+    /// is recorded as another source on it — no new article, no extra AI spend.
+    /// Otherwise a fresh article is generated. Returns "created", "appended" or "failed".
+    /// </summary>
+    private async Task<string> UpsertArticleForBoutAsync(string boutSlug, JsonObject bout, JsonObject snapA, JsonObject snapB, FightAnnouncement item, CancellationToken ct)
+    {
+        var sourceEntry = new JsonObject
+        {
+            ["source"] = item.MergedFromSources is { Count: > 0 } m ? string.Join(", ", m) : item.SourceName,
+            ["url"] = item.SourceUrl,
+            ["headline"] = item.RawHeadline,
+            ["seen_at"] = DateTimeOffset.UtcNow.ToString("o"),
+        };
+
+        var latest = await _supabase.SelectAsync("articles",
+            $"select=id,published_at,sources&bout_slug=eq.{Uri.EscapeDataString(boutSlug)}&order=published_at.desc&limit=1", ct);
+
+        if (latest.Count > 0)
+        {
+            var art = latest[0]!.AsObject();
+            var publishedAt = DateTimeOffset.TryParse(art["published_at"]?.GetValue<string>(), out var p) ? p : DateTimeOffset.MinValue;
+            if (DateTimeOffset.UtcNow - publishedAt <= ArticleWindow)
+            {
+                var sources = art["sources"]?.DeepClone().AsArray() ?? [];
+                var already = !string.IsNullOrEmpty(item.SourceUrl)
+                    && sources.Any(s => s?["url"]?.GetValue<string>() == item.SourceUrl);
+                if (!already)
+                {
+                    sources.Add(sourceEntry.DeepClone());
+                    var id = art["id"]!.GetValue<long>();
+                    await _supabase.UpdateAsync("articles", $"id=eq.{id}", new JsonObject { ["sources"] = sources }, ct);
+                }
+                return "appended";
+            }
+        }
+
+        var article = await _articles.GenerateAsync(bout, snapA, snapB, ct);
+        if (article is null) return "failed";
+
+        await _supabase.InsertAsync("articles", new JsonObject
+        {
+            ["bout_slug"] = boutSlug,
+            ["title"] = article["title"]?.DeepClone(),
+            ["summary"] = article["summary"]?.DeepClone(),
+            ["body"] = article["body"]?.DeepClone(),
+            ["tags"] = article["tags"]?.DeepClone(),
+            ["ai_generated"] = true,
+            ["published_at"] = DateTimeOffset.UtcNow.ToString("o"),
+            ["sources"] = new JsonArray(sourceEntry.DeepClone()),
+        }, ct);
+        return "created";
+    }
+
+    /// <summary>
+    /// Generates an article for any bout that has none (e.g. generation failed
+    /// on the run that created the bout). Uses the bout's frozen snapshots.
     /// </summary>
     public async Task<int> RetryMissingArticlesAsync(CancellationToken ct = default)
     {
         var bouts = await _supabase.SelectAsync("bouts",
-            "select=slug,weight_class,event_date,announced_at,headline,source,source_url,fighter_a_snapshot,fighter_b_snapshot", ct);
-        var articleSlugs = (await _supabase.SelectAsync("articles", "select=slug", ct))
-            .Select(a => a?["slug"]?.GetValue<string>())
+            "select=slug,weight_class,event_date,fighter_a_snapshot,fighter_b_snapshot", ct);
+        var withArticles = (await _supabase.SelectAsync("articles", "select=bout_slug", ct))
+            .Select(a => a?["bout_slug"]?.GetValue<string>())
             .ToHashSet();
 
         var recovered = 0;
         foreach (var row in bouts.OfType<JsonObject>())
         {
             var slug = row["slug"]!.GetValue<string>();
-            if (articleSlugs.Contains(slug)) continue;
+            if (withArticles.Contains(slug)) continue;
 
             var snapA = row["fighter_a_snapshot"]!.AsObject();
             var snapB = row["fighter_b_snapshot"]!.AsObject();
@@ -229,10 +268,6 @@ public class BoutProcessor
                 ["fighter_b"] = snapB["_meta"]?["name"]?.DeepClone(),
                 ["weightClass"] = row["weight_class"]?.DeepClone(),
                 ["eventDate"] = row["event_date"]?.DeepClone(),
-                ["announcedAt"] = row["announced_at"]?.DeepClone(),
-                ["headline"] = row["headline"]?.DeepClone(),
-                ["source"] = row["source"]?.DeepClone(),
-                ["link"] = row["source_url"]?.DeepClone(),
             };
 
             var article = await _articles.GenerateAsync(bout, snapA, snapB, ct);
@@ -242,15 +277,17 @@ public class BoutProcessor
                 continue;
             }
 
-            await _supabase.UpsertAsync("articles", [new JsonObject
+            await _supabase.InsertAsync("articles", new JsonObject
             {
-                ["slug"] = slug,
+                ["bout_slug"] = slug,
                 ["title"] = article["title"]?.DeepClone(),
                 ["summary"] = article["summary"]?.DeepClone(),
                 ["body"] = article["body"]?.DeepClone(),
                 ["tags"] = article["tags"]?.DeepClone(),
                 ["ai_generated"] = true,
-            }], "slug", ct);
+                ["published_at"] = DateTimeOffset.UtcNow.ToString("o"),
+                ["sources"] = new JsonArray(),
+            }, ct);
             await _supabase.UpdateAsync("seen_feed_items",
                 $"bout_slug=eq.{Uri.EscapeDataString(slug)}",
                 new JsonObject { ["status"] = "article_created" }, ct);

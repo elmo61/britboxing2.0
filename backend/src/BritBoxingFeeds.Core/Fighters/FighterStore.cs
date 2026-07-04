@@ -96,6 +96,9 @@ public class FighterStore
         var raw = Regex.Replace(name, @"\([^)]*\)", ""); // drop "(boxer)" disambiguation
         var normalized = raw.Normalize(NormalizationForm.FormKD);
         var ascii = new string(normalized.Where(c => c < 128).ToArray());
+        // Drop apostrophes/periods rather than turning them into separators, so
+        // "M'billi" == "Mbilli" and "St. Pierre" == "St Pierre".
+        ascii = ascii.Replace("'", "").Replace("’", "").Replace(".", "");
         return Regex.Replace(ascii.ToLowerInvariant(), @"[^a-z0-9]+", "-").Trim('-');
     }
 }

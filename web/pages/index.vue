@@ -82,7 +82,10 @@ function motif(i: number): string { return CARD_MOTIFS[i % CARD_MOTIFS.length] }
         <div class="card__fighters">{{ names(featured.matchup)[0] }} <span class="card__vs">v</span> {{ names(featured.matchup)[1] }}</div>
         <div class="card__meta" style="margin-top:8px">{{ cardMeta(featured) }}</div>
         <p class="card__sum">{{ featured.summary }}</p>
-        <span class="card__cta">Read the full preview →</span>
+        <div class="card__foot">
+          <span class="card__cta">Read the full preview →</span>
+          <span v-if="formatPostedAt(featured.postedAt)" class="card__posted">Posted {{ formatPostedAt(featured.postedAt) }}</span>
+        </div>
       </NuxtLink>
 
       <!-- standard -->
@@ -94,7 +97,10 @@ function motif(i: number): string { return CARD_MOTIFS[i % CARD_MOTIFS.length] }
         </div>
         <div class="card__fighters">{{ names(f.matchup)[0] }} <span class="card__vs">v</span> {{ names(f.matchup)[1] }}</div>
         <p class="card__sum">{{ f.summary }}</p>
-        <span class="card__cta">Read preview →</span>
+        <div class="card__foot">
+          <span class="card__cta">Read preview →</span>
+          <span v-if="formatPostedAt(f.postedAt)" class="card__posted">Posted {{ formatPostedAt(f.postedAt) }}</span>
+        </div>
       </NuxtLink>
 
       <!-- compact tail -->

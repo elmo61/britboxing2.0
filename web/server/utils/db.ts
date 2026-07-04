@@ -6,7 +6,7 @@ function one<T>(rel: T | T[] | null | undefined): T | undefined {
   return Array.isArray(rel) ? rel[0] : (rel ?? undefined)
 }
 
-/** Home list: every bout that has a published article, newest post first. */
+/** Home list: one card per fight, showing its most recent article. */
 export async function getFightList() {
   const sb = useSupabase()
   const { data, error } = await sb
@@ -15,34 +15,41 @@ export async function getFightList() {
   if (error) throw createError({ statusCode: 502, statusMessage: error.message })
   return (data ?? [])
     .map((b: any) => {
-      const art = one<any>(b.articles)
+      // A bout can have several articles; the card reflects the newest one.
+      const arts = (Array.isArray(b.articles) ? b.articles : [b.articles]).filter(Boolean)
+      const latest = arts.sort((x: any, y: any) => (y.published_at ?? '').localeCompare(x.published_at ?? ''))[0]
       return {
         slug: b.slug,
-        title: art?.title ?? b.slug,
-        summary: art?.summary ?? '',
+        title: latest?.title ?? b.slug,
+        summary: latest?.summary ?? '',
         matchup: `${b.fighter_a_snapshot?._meta?.name} vs ${b.fighter_b_snapshot?._meta?.name}`,
         division: b.weight_class ?? '',
         status: b.status ?? 'confirmed',
-        postedAt: art?.published_at ?? null,
+        postedAt: latest?.published_at ?? null,
         eventDate: b.event_date ?? null,
+        articleCount: arts.length,
       }
     })
     .sort((a: any, b: any) => (b.postedAt ?? '').localeCompare(a.postedAt ?? ''))
 }
 
-/** Full fight: article + bout context + both frozen snapshots. */
+/** Full fight: bout context + both frozen snapshots + all its articles (newest first). */
 export async function getFight(slug: string) {
   const sb = useSupabase()
   const { data, error } = await sb
     .from('bouts')
-    .select('slug, status, weight_class, event_date, source, headline, fighter_a_id, fighter_b_id, '
-      + 'fighter_a_snapshot, fighter_b_snapshot, articles!inner(title, summary, body, tags, ai_generated, slug, published_at)')
+    .select('slug, status, weight_class, event_date, fighter_a_id, fighter_b_id, '
+      + 'fighter_a_snapshot, fighter_b_snapshot, '
+      + 'articles!inner(id, title, summary, body, tags, ai_generated, published_at, sources)')
     .eq('slug', slug)
     .single()
   if (error || !data) throw createError({ statusCode: 404, statusMessage: `Fight '${slug}' not found` })
+  const articles = (Array.isArray(data.articles) ? data.articles : [data.articles])
+    .filter(Boolean)
+    .sort((x: any, y: any) => (y.published_at ?? '').localeCompare(x.published_at ?? ''))
   return {
     slug: data.slug,
-    article: one<any>(data.articles),
+    articles,
     bout: {
       fighter_a: data.fighter_a_snapshot?._meta?.name,
       fighter_b: data.fighter_b_snapshot?._meta?.name,
@@ -51,8 +58,6 @@ export async function getFight(slug: string) {
       weightClass: data.weight_class,
       eventDate: data.event_date,
       status: data.status ?? 'confirmed',
-      source: data.source,
-      headline: data.headline,
     },
     fighterA: data.fighter_a_snapshot,
     fighterB: data.fighter_b_snapshot,

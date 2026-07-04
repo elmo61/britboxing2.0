@@ -161,7 +161,15 @@ footer.attribution a { color: var(--muted); }
 .card__sum { color: var(--muted); font-size: .92rem; margin: 10px 0 0; flex: 1; }
 .card__cta {
   font-family: var(--font-cond); font-weight: 600; font-size: .74rem; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--gold); margin-top: 14px;
+  text-transform: uppercase; color: var(--gold);
+}
+.card__foot {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  flex-wrap: wrap; margin-top: 14px;
+}
+.card__posted {
+  font-family: var(--font-cond); font-weight: 500; font-size: .68rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
 }
 /* chip inside a card sits flush-left (override the inline .status margin) */
 .card__top .status { margin-left: 0; }

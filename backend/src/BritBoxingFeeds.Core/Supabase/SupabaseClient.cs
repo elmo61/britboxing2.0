@@ -62,6 +62,18 @@ public class SupabaseClient
         await EnsureSuccessAsync(response, $"upsert {table}", ct);
     }
 
+    /// <summary>Plain INSERT (no upsert) — for tables with a generated id where each call adds a new row.</summary>
+    public async Task InsertAsync(string table, JsonObject row, CancellationToken ct = default)
+    {
+        EnsureEnabled();
+        using var request = BuildRequest(HttpMethod.Post, $"{_baseUrl}/rest/v1/{table}");
+        request.Content = new StringContent(new JsonArray(row.DeepClone()).ToJsonString(), Encoding.UTF8, "application/json");
+        request.Headers.Add("Prefer", "return=minimal");
+
+        var response = await _http.SendAsync(request, ct);
+        await EnsureSuccessAsync(response, $"insert {table}", ct);
+    }
+
     /// <summary>PATCH the rows matching <paramref name="filter"/> (raw PostgREST filter, e.g. "item_key=eq.abc").</summary>
     public async Task UpdateAsync(string table, string filter, JsonObject patch, CancellationToken ct = default)
     {

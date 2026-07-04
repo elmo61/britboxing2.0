@@ -81,7 +81,7 @@ public class FightDeduplicator : IFightDeduplicator
     }
 
     private static string Normalize(string name) =>
-        name.Trim().ToLowerInvariant().Replace(".", "").Replace("-", " ");
+        name.Trim().ToLowerInvariant().Replace("'", "").Replace("’", "").Replace(".", "").Replace("-", " ");
 
     private static FightAnnouncement MergeGroup(List<FightAnnouncement> group)
     {

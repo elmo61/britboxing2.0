@@ -200,8 +200,9 @@ Console.WriteLine(
     $"{enriched.Count} processed, {deduped.Count} after dedup.");
 Console.WriteLine(
     $"Processing: {summary.Considered} considered ({resumed.Count} resumed from earlier runs), " +
-    $"{summary.Ignored} ignored, {summary.AlreadyExisted} already existed, " +
-    $"{summary.BoutsCreated} bouts created, {summary.ArticlesCreated} articles published, " +
+    $"{summary.Ignored} ignored, {summary.AlreadyExisted} existing bouts, " +
+    $"{summary.BoutsCreated} bouts created, {summary.ArticlesCreated} articles written, " +
+    $"{summary.ArticlesAppended} sources added to open articles, " +
     $"{recoveredArticles} missing articles recovered.");
 Console.WriteLine();
 

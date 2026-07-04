@@ -9,6 +9,8 @@ if (error.value || !fight.value) {
 }
 
 const f = fight.value
+const articles = f.articles ?? []
+const lead = articles[0] // newest — drives the page title / meta
 const wikiSources = [
   { label: `${f.bout.fighter_a} (Wikipedia)`, url: f.fighterA._meta.source },
   { label: `${f.bout.fighter_b} (Wikipedia)`, url: f.fighterB._meta.source },
@@ -21,12 +23,13 @@ function record(s: any): string {
   return r.winsKo != null ? `${base} · ${r.winsKo} KO` : base
 }
 
+const pageTitle = lead?.title ?? `${f.bout.fighter_a} vs ${f.bout.fighter_b}`
 useHead(() => ({
-  title: `${f.article.title} | BritBoxing`,
+  title: `${pageTitle} | BritBoxing`,
   meta: [
-    { name: 'description', content: f.article.summary },
-    { property: 'og:title', content: f.article.title },
-    { property: 'og:description', content: f.article.summary },
+    { name: 'description', content: lead?.summary ?? '' },
+    { property: 'og:title', content: pageTitle },
+    { property: 'og:description', content: lead?.summary ?? '' },
     { name: 'twitter:card', content: 'summary_large_image' },
   ],
 }))
@@ -70,19 +73,21 @@ useHead(() => ({
       <FightCard :fighter-a="f.fighterA" :fighter-b="f.fighterB" />
     </div>
 
-    <article>
-      <h2 class="article-title">{{ f.article.title }}</h2>
+    <article v-for="(a, ai) in articles" :key="a.id" class="preview" :class="{ 'preview--later': ai > 0 }">
+      <h2 class="article-title">{{ a.title }}</h2>
       <div class="meta-dates">
-        <template v-if="formatPostedAt(f.article.published_at)">Posted {{ formatPostedAt(f.article.published_at) }}</template>
+        <template v-if="formatPostedAt(a.published_at)">Posted {{ formatPostedAt(a.published_at) }}</template>
       </div>
-      <p class="summary">{{ f.article.summary }}</p>
-      <div class="announce">Announced via {{ f.bout.source }}: &ldquo;{{ f.bout.headline }}&rdquo;</div>
-      <div v-html="f.article.body" />
+      <p class="summary">{{ a.summary }}</p>
+      <div v-html="a.body" />
+      <div v-if="a.tags?.length" class="tags">
+        <span v-for="(t, i) in a.tags" :key="i">{{ t }}</span>
+      </div>
+      <p v-if="a.sources?.length" class="art-sources">
+        Reported by
+        <template v-for="(s, i) in a.sources" :key="i"><a v-if="s.url" :href="s.url">{{ s.source }}</a><template v-else>{{ s.source }}</template><template v-if="i < a.sources.length - 1"> · </template></template>
+      </p>
     </article>
-
-    <div class="tags">
-      <span v-for="(t, i) in f.article.tags" :key="i">{{ t }}</span>
-    </div>
 
     <footer class="attribution">
       <p>
@@ -102,4 +107,13 @@ useHead(() => ({
   font-family: var(--font-cond); font-weight: 600; line-height: 1.1;
   font-size: 1.9rem; margin: 34px 0 6px;
 }
+/* second and later articles on the same fight get a divider above them */
+.preview--later {
+  border-top: 1px solid var(--line); margin-top: 40px; padding-top: 8px;
+}
+.art-sources {
+  font-family: var(--font-cond); font-weight: 500; font-size: .8rem;
+  letter-spacing: .04em; color: var(--muted); margin-top: 18px;
+}
+.art-sources a { color: var(--gold); }
 </style>

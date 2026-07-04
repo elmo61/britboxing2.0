@@ -89,7 +89,7 @@ public class SeenFeedItemsStore
     }
 
     private static string NormalizeName(string name) =>
-        name.Trim().ToLowerInvariant().Replace(".", "").Replace("-", " ");
+        name.Trim().ToLowerInvariant().Replace("'", "").Replace("’", "").Replace(".", "").Replace("-", " ");
 
     /// <summary>
     /// Verifies Supabase is actually reachable before the run does anything
