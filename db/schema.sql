@@ -41,7 +41,7 @@ create table if not exists bouts (
     slug               text primary key,        -- '<fighterAId>-vs-<fighterBId>'
     fighter_a_id       text references fighters(id),
     fighter_b_id       text references fighters(id),
-    status             text not null default 'confirmed', -- confirmed | rumoured | cancelled
+    status             text not null default 'confirmed', -- confirmed | rumoured | cancelled | completed
     weight_class       text,
     event_id           bigint references events(id),
     event_date         date,                    -- null = TBC
@@ -49,6 +49,7 @@ create table if not exists bouts (
     headline           text,
     source             text,
     source_url         text,
+    result             jsonb,                   -- {winner, method, round, sourceUrl} once the fight happens
     -- FROZEN at announcement time — never rewritten when a fighter updates
     fighter_a_snapshot jsonb not null,
     fighter_b_snapshot jsonb not null,
@@ -77,6 +78,7 @@ create unique index if not exists idx_articles_bout_slug_uniq on articles(bout_s
 -- Idempotent upgrade for databases created before the columns existed.
 alter table fighters add column if not exists nationality text;
 alter table bouts    add column if not exists status text not null default 'confirmed';
+alter table bouts    add column if not exists result jsonb;
 
 create index if not exists idx_bouts_fighter_a on bouts(fighter_a_id);
 create index if not exists idx_bouts_fighter_b on bouts(fighter_b_id);

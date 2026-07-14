@@ -39,7 +39,7 @@ export async function getFight(slug: string) {
   const sb = useSupabase()
   const { data, error } = await sb
     .from('bouts')
-    .select('slug, status, weight_class, event_date, fighter_a_id, fighter_b_id, '
+    .select('slug, status, result, weight_class, event_date, fighter_a_id, fighter_b_id, '
       + 'fighter_a_snapshot, fighter_b_snapshot, '
       + 'articles(id, slug, title, summary, body, tags, status, ai_generated, published_at, sources)')
     .eq('slug', slug)
@@ -59,6 +59,7 @@ export async function getFight(slug: string) {
       weightClass: data.weight_class,
       eventDate: data.event_date,
       status: data.status ?? 'confirmed',
+      result: data.result ?? null,
     },
     fighterA: data.fighter_a_snapshot,
     fighterB: data.fighter_b_snapshot,
@@ -70,7 +71,7 @@ export async function getSchedule() {
   const sb = useSupabase()
   const { data, error } = await sb
     .from('bouts')
-    .select('slug, status, weight_class, event_date, fighter_a_snapshot, fighter_b_snapshot')
+    .select('slug, status, result, weight_class, event_date, fighter_a_snapshot, fighter_b_snapshot')
     .order('event_date', { ascending: true, nullsFirst: false })
   if (error) throw createError({ statusCode: 502, statusMessage: error.message })
   return (data ?? []).map((b: any) => ({
@@ -80,6 +81,7 @@ export async function getSchedule() {
     division: b.weight_class ?? '',
     status: b.status ?? 'confirmed',
     eventDate: b.event_date,
+    result: b.result ?? null,
   }))
 }
 

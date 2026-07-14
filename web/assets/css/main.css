@@ -194,7 +194,7 @@ footer.attribution a { color: var(--muted); }
 
 .empty { color: var(--muted); font-family: var(--font-cond); letter-spacing: .04em; padding: 20px 2px; }
 
-/* fight status chip — confirmed / rumoured / cancelled */
+/* fight status chip — confirmed / rumoured / cancelled / completed / result */
 .status {
   display: inline-block; font-family: var(--font-cond); font-weight: 600;
   font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
@@ -204,6 +204,7 @@ footer.attribution a { color: var(--muted); }
 .status--confirmed { color: var(--win); border-color: var(--win); }
 .status--rumoured { color: var(--muted); border-color: var(--muted); }
 .status--cancelled { color: var(--loss); border-color: var(--loss); text-decoration: line-through; }
+.status--completed, .status--result { color: var(--gold); border-color: var(--gold); }
 
 /* posted / fight-date meta line on the article page */
 .meta-dates {
@@ -336,6 +337,7 @@ footer.attribution a { color: var(--muted); }
 }
 .billstrip strong { color: var(--ink); font-weight: 600; }
 .billstrip .status { margin-left: 0; }
+.billstrip__result strong { color: var(--gold); }
 
 @media (max-width: 620px) {
   .poster { grid-template-columns: 1fr; gap: 6px; text-align: center; }

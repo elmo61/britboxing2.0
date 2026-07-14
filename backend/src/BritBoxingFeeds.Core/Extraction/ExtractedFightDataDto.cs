@@ -17,4 +17,7 @@ internal class ExtractedFightDataDto
     public string? Broadcaster { get; set; }
     public bool? IsUpcoming { get; set; }        // true = announced/scheduled, false = result/report of a past fight, null = can't tell
     public string? Status { get; set; }          // "confirmed" | "rumoured" | "cancelled", null = can't tell
+    public string? ResultWinner { get; set; }    // result items only: winner's name, null for draw/unclear
+    public string? ResultMethod { get; set; }    // result items only: KO | TKO | UD | SD | MD | DQ | RTD
+    public int? ResultRound { get; set; }        // result items only: ending round, null for decisions
 }

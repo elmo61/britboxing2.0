@@ -74,6 +74,7 @@ services.AddHttpClient<SeenFeedItemsStore>();
 services.AddHttpClient<SupabaseClient>();
 services.AddHttpClient<WikipediaSnapshotService>();
 services.AddHttpClient<ArticleGenerator>();
+services.AddHttpClient<SourcePageFetcher>();
 services.AddTransient<FighterStore>();
 services.AddTransient<BoutProcessor>();
 services.AddHttpClient<FightDateEnricher>();
@@ -106,6 +107,23 @@ if (args.Contains("enrich-dates"))
     // test): `enrich-dates 3`. No arg => all dateless confirmed bouts.
     var limit = args.Select(x => int.TryParse(x, out var n) ? n : 0).FirstOrDefault(n => n > 0);
     await RunDateEnrichmentAsync(provider, limit == 0 ? int.MaxValue : limit);
+    return;
+}
+
+// Validation tool: `preview-article <bout-slug> [--write]` regenerates one
+// bout's article with the current prompt and prints the prompt + result +
+// lint report. Nothing is persisted unless --write is passed. Exactly one
+// API call per invocation — the cheap way to iterate on article quality.
+if (args.Contains("preview-article"))
+{
+    var slugArg = args.SkipWhile(a => a != "preview-article").Skip(1).FirstOrDefault(a => !a.StartsWith("--"));
+    if (slugArg is null)
+    {
+        Console.Error.WriteLine("Usage: preview-article <bout-slug> [--write]");
+        Environment.Exit(2);
+        return;
+    }
+    await RunPreviewArticleAsync(provider, slugArg, write: args.Contains("--write"));
     return;
 }
 
@@ -180,7 +198,7 @@ var recoveredArticles = await processor.RetryMissingArticlesAsync();
 
 // The site is statically generated — a rebuild is what actually publishes
 // new content, so trigger one only when this run created something.
-if (summary.BoutsCreated + summary.ArticlesCreated + recoveredArticles > 0)
+if (summary.BoutsCreated + summary.ArticlesCreated + summary.ArticlesRegenerated + recoveredArticles > 0)
 {
     await provider.GetRequiredService<SiteDeployTrigger>().TriggerAsync();
 }
@@ -215,6 +233,7 @@ Console.WriteLine(
     $"{summary.Ignored} ignored, {summary.AlreadyExisted} existing bouts, " +
     $"{summary.BoutsCreated} bouts created, {summary.ArticlesCreated} articles written, " +
     $"{summary.ArticlesAppended} sources added to open articles, " +
+    $"{summary.ArticlesRegenerated} regenerated on confirmation, " +
     $"{recoveredArticles} missing articles recovered.");
 Console.WriteLine();
 
@@ -232,6 +251,107 @@ foreach (var item in ordered)
 }
 
 // Fills missing fight dates for still-live bouts via web-search grounding.
+// Regenerates one bout's article with the current prompt for quality
+// iteration. Prints the full prompt, the generated JSON and the lint report;
+// persists (PATCH onto the bout's latest article, or INSERT if none) only
+// when --write is passed.
+static async Task RunPreviewArticleAsync(IServiceProvider provider, string boutSlug, bool write)
+{
+    var supabase = provider.GetRequiredService<SupabaseClient>();
+    var generator = provider.GetRequiredService<ArticleGenerator>();
+    var processor = provider.GetRequiredService<BoutProcessor>();
+
+    var bouts = await supabase.SelectAsync("bouts",
+        $"select=slug,status,weight_class,event_date,fighter_a_snapshot,fighter_b_snapshot&slug=eq.{Uri.EscapeDataString(boutSlug)}");
+    if (bouts.Count == 0)
+    {
+        Console.Error.WriteLine($"No bout found with slug '{boutSlug}'.");
+        Environment.Exit(2);
+        return;
+    }
+
+    var row = bouts[0]!.AsObject();
+    var snapA = row["fighter_a_snapshot"]!.AsObject();
+    var snapB = row["fighter_b_snapshot"]!.AsObject();
+    var (coverage, sources) = await processor.CoverageFromSeenItemsAsync(boutSlug);
+    var bout = new System.Text.Json.Nodes.JsonObject
+    {
+        ["fighter_a"] = snapA["_meta"]?["name"]?.DeepClone(),
+        ["fighter_b"] = snapB["_meta"]?["name"]?.DeepClone(),
+        ["weightClass"] = row["weight_class"]?.DeepClone(),
+        ["eventDate"] = row["event_date"]?.DeepClone(),
+        ["fightStatus"] = row["status"]?.DeepClone(),
+        ["coverage"] = coverage,
+    };
+
+    var promptRecord = ArticleGenerator.BuildPromptRecord(bout, snapA, snapB);
+    Console.WriteLine("================ SYSTEM PROMPT ================");
+    Console.WriteLine(promptRecord["system"]?.GetValue<string>());
+    Console.WriteLine();
+    Console.WriteLine("================ USER PROMPT ==================");
+    Console.WriteLine(promptRecord["user"]?.GetValue<string>());
+    Console.WriteLine();
+
+    Console.WriteLine("================ GENERATING (1 API call) ======");
+    var article = await generator.GenerateAsync(bout, snapA, snapB);
+    if (article is null)
+    {
+        Console.Error.WriteLine("Generation failed — see log output above.");
+        Environment.Exit(1);
+        return;
+    }
+
+    Console.WriteLine("================ RESULT =======================");
+    Console.WriteLine(article.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+
+    // GenerateAsync already lint-fixed the article; run a fresh detection pass
+    // purely to report the outcome.
+    var lint = ArticleLinter.Lint(article);
+    Console.WriteLine();
+    Console.WriteLine($"Lint: {lint.FixCount} residual hard-rule fixes, {lint.Warnings.Count} warnings"
+        + (lint.Warnings.Count > 0 ? ": " + string.Join("; ", lint.Warnings) : "."));
+
+    if (!write)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Dry run — nothing persisted. Re-run with --write to save.");
+        return;
+    }
+
+    var latest = await supabase.SelectAsync("articles",
+        $"select=id&bout_slug=eq.{Uri.EscapeDataString(boutSlug)}&order=published_at.desc&limit=1");
+    if (latest.Count > 0)
+    {
+        await supabase.UpdateAsync("articles", $"id=eq.{latest[0]!["id"]!.GetValue<long>()}", new System.Text.Json.Nodes.JsonObject
+        {
+            ["title"] = article["title"]?.DeepClone(),
+            ["summary"] = article["summary"]?.DeepClone(),
+            ["body"] = article["body"]?.DeepClone(),
+            ["tags"] = article["tags"]?.DeepClone(),
+            ["sources"] = sources,
+        });
+        Console.WriteLine("Updated the bout's latest article in place (slug/published_at kept).");
+    }
+    else
+    {
+        await supabase.InsertAsync("articles", new System.Text.Json.Nodes.JsonObject
+        {
+            ["bout_slug"] = boutSlug,
+            ["slug"] = "preview",
+            ["status"] = row["status"]?.DeepClone(),
+            ["title"] = article["title"]?.DeepClone(),
+            ["summary"] = article["summary"]?.DeepClone(),
+            ["body"] = article["body"]?.DeepClone(),
+            ["tags"] = article["tags"]?.DeepClone(),
+            ["ai_generated"] = true,
+            ["published_at"] = DateTimeOffset.UtcNow.ToString("o"),
+            ["sources"] = sources,
+        });
+        Console.WriteLine("Inserted a new article for the bout.");
+    }
+    await provider.GetRequiredService<SiteDeployTrigger>().TriggerAsync();
+}
+
 // Web-searches each dateless confirmed bout for (a) a source-backed date and
 // (b) whether sources actually treat it as officially confirmed. A date is only
 // stored when the model cited a source (see FightDateEnricher). When no date is

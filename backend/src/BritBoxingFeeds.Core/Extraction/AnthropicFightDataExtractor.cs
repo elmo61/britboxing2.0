@@ -106,7 +106,10 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
                 TitleOnTheLine = dto.TitleOnTheLine ?? raw.TitleOnTheLine,
                 Broadcaster = dto.Broadcaster ?? raw.Broadcaster,
                 IsUpcoming = dto.IsUpcoming ?? raw.IsUpcoming,
-                FightStatus = dto.Status ?? raw.FightStatus
+                FightStatus = dto.Status ?? raw.FightStatus,
+                ResultWinner = dto.ResultWinner ?? raw.ResultWinner,
+                ResultMethod = dto.ResultMethod ?? raw.ResultMethod,
+                ResultRound = dto.ResultRound ?? raw.ResultRound
             };
         }
         catch (Exception ex)
@@ -136,7 +139,10 @@ public class AnthropicFightDataExtractor : IFightDataExtractor
           "titleOnTheLine": string | null,  // e.g. "WBC", "IBF", null if not a title fight
           "broadcaster": string | null,     // e.g. "DAZN", "Sky Sports", null if not mentioned
           "isUpcoming": boolean | null,     // true = an announced/scheduled fight; false = a report/result of a fight that already happened; null = can't tell
-          "status": string | null           // "confirmed" = officially announced/signed; "rumoured" = talks/speculation/being ordered; "cancelled" = called off/postponed; null = can't tell
+          "status": string | null,          // "confirmed" = officially announced/signed; "rumoured" = talks/speculation/being ordered; "cancelled" = called off/postponed; null = can't tell
+          "resultWinner": string | null,    // ONLY when isUpcoming=false: the winner's full name as stated in the text; null for a draw or if unclear
+          "resultMethod": string | null,    // ONLY when isUpcoming=false: "KO" | "TKO" | "UD" | "SD" | "MD" | "DQ" | "RTD" if stated
+          "resultRound": number | null      // ONLY when isUpcoming=false: the round the fight ended, if stated (null for decisions)
         }
         """);
         sb.AppendLine();
