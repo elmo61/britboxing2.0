@@ -5,6 +5,7 @@ useHead({
   title: 'BritBoxing · the latest',
   meta: [{ name: 'description', content: 'Data-driven boxing previews and news.' }],
 })
+useSeoMeta({ ogImage: 'https://britboxing.co.uk/og-default.png', twitterCard: 'summary_large_image', twitterImage: 'https://britboxing.co.uk/og-default.png' }) // static default share card
 
 const route = useRoute()
 const router = useRouter()

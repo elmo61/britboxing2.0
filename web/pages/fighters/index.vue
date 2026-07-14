@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { data: fighters } = await useFetch('/api/fighters')
 useHead({ title: 'Fighters | BritBoxing' })
+useSeoMeta({ ogImage: 'https://britboxing.co.uk/og-default.png', twitterCard: 'summary_large_image', twitterImage: 'https://britboxing.co.uk/og-default.png' }) // static default share card
 
 const route = useRoute()
 const router = useRouter()

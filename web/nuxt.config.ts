@@ -4,6 +4,24 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
 
+  modules: ['@nuxt/fonts', 'nuxt-og-image'],
+
+  // Absolute URL base for og:image tags (and canonicals, when the SEO pass lands).
+  site: {
+    url: 'https://britboxing.co.uk',
+    name: 'BritBoxing',
+  },
+
+  // Share-card fonts: og-image v6 reads satori fonts from the @font-face
+  // rules @nuxt/fonts emits globally — hence global: true on each family.
+  fonts: {
+    families: [
+      { name: 'Anton', weights: [400], global: true },
+      { name: 'Oswald', weights: [500, 600], global: true },
+      { name: 'Inter', weights: [400], global: true },
+    ],
+  },
+
   // Server-only config. The Nitro API routes read from Supabase using these
   // (the browser-safe publishable pair); values come from web/.env (gitignored).
   runtimeConfig: {

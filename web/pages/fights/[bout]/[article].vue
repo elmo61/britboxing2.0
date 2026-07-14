@@ -30,6 +30,9 @@ useHead(() => ({
     { name: 'twitter:card', content: 'summary_large_image' },
   ],
 }))
+
+// Build-time 1200x630 share card (og:image + twitter:image).
+defineOgImage('FightCard', fightCardProps(f.value))
 </script>
 
 <template>

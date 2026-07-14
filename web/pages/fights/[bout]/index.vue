@@ -15,6 +15,9 @@ const wikiSources = [
 ]
 
 useHead({ title: `${f.value.bout.fighter_a} vs ${f.value.bout.fighter_b} | BritBoxing` })
+
+// Build-time 1200x630 share card (og:image + twitter:image).
+defineOgImage('FightCard', fightCardProps(f.value))
 </script>
 
 <template>

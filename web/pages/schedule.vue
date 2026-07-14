@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { data: bouts } = await useFetch('/api/schedule')
 useHead({ title: 'Schedule | BritBoxing' })
+useSeoMeta({ ogImage: 'https://britboxing.co.uk/og-default.png', twitterCard: 'summary_large_image', twitterImage: 'https://britboxing.co.uk/og-default.png' }) // static default share card
 
 // Completed fights drop out of the upcoming list into "Recent results",
 // newest result first.
