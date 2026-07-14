@@ -4,18 +4,20 @@
 // meta tags for platforms that read link previews automatically; this makes
 // the same image a real, clickable link on the page itself, plus one-tap
 // share intents so a reader doesn't have to know link-preview mechanics exist.
-const props = defineProps<{ title: string }>()
+const props = defineProps<{ title: string, boutSlug: string }>()
 
 const route = useRoute()
-const pageUrl = computed(() => useRequestURL().origin + route.path)
+const origin = useRequestURL().origin
+const pageUrl = computed(() => origin + route.path)
 
-// The exact PNG being served for this page — read from the meta tag Nuxt SSR
-// already rendered, rather than recomputing the og-image module's own URL
-// logic (hashed query params etc.) a second time here.
-const cardImageUrl = ref<string | null>(null)
-onMounted(() => {
-  cardImageUrl.value = document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? null
-})
+// The build's stabilize-share-images.mjs step rewrites every fight/article
+// page's og:image to exactly this permanent URL (see that script for why:
+// nuxt-og-image's own filename is props-derived and changes whenever the
+// bout's status/result changes). Compute it directly rather than reading the
+// og:image meta tag — Unhead can reactively re-apply the page's original,
+// unstable URL to the live DOM on hydration even though the static HTML any
+// crawler actually reads was already correctly rewritten.
+const cardImageUrl = computed(() => `${origin}/cards/${props.boutSlug}.png`)
 
 const xHref = computed(() =>
   `https://twitter.com/intent/tweet?text=${encodeURIComponent(props.title)}&url=${encodeURIComponent(pageUrl.value)}`)
