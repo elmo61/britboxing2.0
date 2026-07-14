@@ -31,6 +31,15 @@ public record FightAnnouncement
     /// <summary>Set by the LLM extractor: "confirmed" (officially announced), "rumoured" (talks/speculation), "cancelled" (called off), or null when it couldn't tell.</summary>
     public string? FightStatus { get; init; }
 
+    /// <summary>For result items (IsUpcoming == false): who won, if the text states it. Null for upcoming fights or a draw/unclear outcome.</summary>
+    public string? ResultWinner { get; init; }
+
+    /// <summary>For result items: how it ended — KO/TKO/UD/SD/MD/DQ/RTD, if stated.</summary>
+    public string? ResultMethod { get; init; }
+
+    /// <summary>For result items: the round the fight ended in, if stated (null for decisions).</summary>
+    public int? ResultRound { get; init; }
+
     /// <summary>Full article/press release body, if the source provides it. Used by the downstream extractor.</summary>
     public string? ArticleBody { get; init; }
 
@@ -44,4 +53,15 @@ public record FightAnnouncement
 
     /// <summary>All distinct source URLs that reported this fight, populated alongside MergedFromSources.</summary>
     public IReadOnlyList<string>? AllSourceUrls { get; init; }
+
+    /// <summary>
+    /// Every source's own text for this fight, populated by the deduplicator
+    /// when records merge (the flat ArticleBody only survives from the primary
+    /// record). Null for un-merged items — fall back to
+    /// SourceName/SourceUrl/RawHeadline/ArticleBody.
+    /// </summary>
+    public IReadOnlyList<SourceReport>? SourceReports { get; init; }
 }
+
+/// <summary>One source's report of a fight: where it ran and what it said.</summary>
+public record SourceReport(string Source, string Url, string? Headline, string? Summary);

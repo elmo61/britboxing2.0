@@ -103,7 +103,14 @@ public class FightDeduplicator : IFightDeduplicator
             TitleOnTheLine = group.Select(g => g.TitleOnTheLine).FirstOrDefault(v => v is not null),
             Broadcaster = group.Select(g => g.Broadcaster).FirstOrDefault(v => v is not null),
             MergedFromSources = group.Select(g => g.SourceName).Distinct().ToList(),
-            AllSourceUrls = group.Select(g => g.SourceUrl).Distinct().ToList()
+            AllSourceUrls = group.Select(g => g.SourceUrl).Distinct().ToList(),
+            // Keep every member's own text — the flat ArticleBody above only
+            // carries the primary's, and the article writer wants all of them.
+            SourceReports = group
+                .GroupBy(g => g.SourceUrl)
+                .Select(g => g.First())
+                .Select(g => new SourceReport(g.SourceName, g.SourceUrl, g.RawHeadline, g.ArticleBody))
+                .ToList()
         };
     }
 }
