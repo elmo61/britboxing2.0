@@ -57,6 +57,7 @@ services.AddTransient<IFightSource, WorldBoxingNewsSource>();
 services.AddTransient<IFightSource, GuardianBoxingSource>();
 services.AddTransient<IFightSource, TalkSportBoxingSource>();
 services.AddTransient<IFightSource, BoxingNewsOnlineSource>();
+services.AddTransient<IFightSource, RingMagazineSource>();
 // BoxingSceneSource removed 2026-07-02: their RSS 403s all automated requests.
 
 // YouTube sources need a channel ID per channel, so register instances directly:
@@ -83,6 +84,32 @@ services.AddHttpClient<SiteDeployTrigger>();
 services.AddSingleton<IFightDeduplicator>(_ => new FightDeduplicator());
 
 await using var provider = services.BuildServiceProvider();
+
+// Diagnostic: `test-source <ClassName>` runs one IFightSource in isolation
+// and prints what it found — no Supabase, no AI, no writes. For checking a
+// new/flaky source without spending anything or touching real data.
+if (args.Contains("test-source"))
+{
+    var name = args.SkipWhile(a => a != "test-source").Skip(1).FirstOrDefault();
+    var source = provider.GetServices<IFightSource>().FirstOrDefault(s => s.GetType().Name == name);
+    if (source is null)
+    {
+        Console.Error.WriteLine($"Usage: test-source <ClassName> (e.g. RingMagazineSource). Known sources: "
+            + string.Join(", ", provider.GetServices<IFightSource>().Select(s => s.GetType().Name)));
+        Environment.Exit(2);
+        return;
+    }
+    var items = await source.GetLatestFightsAsync();
+    Console.WriteLine($"{source.SourceName}: {items.Count} items");
+    foreach (var item in items)
+    {
+        Console.WriteLine($"  [{item.PublishedAt:yyyy-MM-dd HH:mm}] {item.RawHeadline}");
+        Console.WriteLine($"    {item.SourceUrl}");
+        if (!string.IsNullOrWhiteSpace(item.ArticleBody))
+            Console.WriteLine($"    summary: {item.ArticleBody}");
+    }
+    return;
+}
 
 // Fail fast: without Supabase there's nowhere to persist results or the
 // seen-items dedup table, so there's no point spending time on RSS/LLM work
