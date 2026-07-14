@@ -6,9 +6,12 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/fonts', 'nuxt-og-image'],
 
-  // Absolute URL base for og:image tags (and canonicals, when the SEO pass lands).
+  // Absolute URL base for og:image tags (and canonicals, when the SEO pass
+  // lands). INTERIM: the Render subdomain — britboxing.co.uk is still parked
+  // at IONOS and not yet connected to Render. Switch back to
+  // https://britboxing.co.uk when the custom domain goes live.
   site: {
-    url: 'https://britboxing.co.uk',
+    url: 'https://britboxing2-0.onrender.com',
     name: 'BritBoxing',
   },
 

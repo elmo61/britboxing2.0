@@ -26,7 +26,7 @@ function height(i: number | null): string {
 }
 
 useHead({ title: `${f.name} | BritBoxing` })
-useSeoMeta({ ogImage: 'https://britboxing.co.uk/og-default.png', twitterCard: 'summary_large_image', twitterImage: 'https://britboxing.co.uk/og-default.png' }) // static default share card
+defaultShareCard() // static default share card
 </script>
 
 <template>
