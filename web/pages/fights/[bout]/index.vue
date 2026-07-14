@@ -16,8 +16,12 @@ const wikiSources = [
 
 useHead({ title: `${f.value.bout.fighter_a} vs ${f.value.bout.fighter_b} | BritBoxing` })
 
-// Build-time 1200x630 share card (og:image + twitter:image).
+// Build-time share cards: hero (1200x630, the primary og:image/twitter:image),
+// plus square and small alternates — additional valid og:image entries with
+// their own width/height, ignored by platforms that only want one.
 defineOgImage('FightCard', fightCardProps(f.value))
+defineOgImage('FightCardSquare', fightCardProps(f.value), { key: 'square', width: 1080, height: 1080 })
+defineOgImage('FightCardSmall', fightCardProps(f.value), { key: 'small', width: 600, height: 315 })
 </script>
 
 <template>

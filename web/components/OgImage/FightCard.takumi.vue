@@ -12,9 +12,17 @@ const props = withDefaults(defineProps<{
   date?: string
   status?: string
   resultLine?: string
+  stats?: string // JSON-encoded CardStatRow[] — see utils/ogCard.ts
+  ageA?: number
+  ageB?: number
 }>(), {})
 
 const isFight = computed(() => !!(props.fighterA && props.fighterB))
+const statRows = computed<any[]>(() => {
+  if (!props.stats) return []
+  try { return JSON.parse(props.stats) } catch { return [] }
+})
+const hasAges = computed(() => props.ageA != null && props.ageB != null)
 
 // Anton at 84px fits ~14 characters on a half-width column; step down for
 // long names ("Richard Riakporhe") so nothing clips.
@@ -85,6 +93,39 @@ const footParts = computed(() => {
               textTransform: 'uppercase', textAlign: 'center', marginTop: '10px',
             }">{{ fighterB }}</div>
             <div v-if="recordB" :style="{ display: 'flex', fontFamily: 'Oswald', fontWeight: 600, fontSize: '26px', letterSpacing: '3px', color: '#e8b84b', marginTop: '12px' }">{{ recordB }}</div>
+          </div>
+        </div>
+
+        <!-- tale of the tape: opposing bars from a shared centre, same metrics
+             and scale as the on-page version (utils/ogCard.ts statRows) -->
+        <div v-if="statRows.length || hasAges" :style="{
+          display: 'flex', flexDirection: 'column', width: '100%', gap: '10px', alignItems: 'center',
+        }">
+          <div :style="{
+            display: 'flex', fontFamily: 'Oswald', fontWeight: 600, fontSize: '15px',
+            letterSpacing: '4px', color: '#9a958c',
+          }">TALE OF THE TAPE</div>
+
+          <div v-for="row in statRows" :key="row.label" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '1040px', gap: '14px' }">
+            <div :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', width: '460px', gap: '12px' }">
+              <div :style="{ display: 'flex', fontFamily: 'Oswald', fontWeight: 600, fontSize: '20px', color: row.redEdge ? '#e8b84b' : '#f4efe6' }">{{ row.redDisp }}</div>
+              <div :style="{ display: 'flex', width: '260px', height: '14px', borderRadius: '7px', backgroundColor: '#1b1a20', justifyContent: 'flex-end', overflow: 'hidden' }">
+                <div :style="{ display: 'flex', width: row.redPct + '%', height: '100%', borderRadius: '7px', backgroundColor: '#e23350' }" />
+              </div>
+            </div>
+            <div :style="{ display: 'flex', width: '120px', justifyContent: 'center', fontFamily: 'Oswald', fontWeight: 500, fontSize: '14px', letterSpacing: '2px', color: '#9a958c' }">{{ row.label.toUpperCase() }}</div>
+            <div :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '460px', gap: '12px' }">
+              <div :style="{ display: 'flex', width: '260px', height: '14px', borderRadius: '7px', backgroundColor: '#1b1a20', overflow: 'hidden' }">
+                <div :style="{ display: 'flex', width: row.bluePct + '%', height: '100%', borderRadius: '7px', backgroundColor: '#5b8be0' }" />
+              </div>
+              <div :style="{ display: 'flex', fontFamily: 'Oswald', fontWeight: 600, fontSize: '20px', color: row.blueEdge ? '#e8b84b' : '#f4efe6' }">{{ row.blueDisp }}</div>
+            </div>
+          </div>
+
+          <div v-if="hasAges" :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '1040px', gap: '14px' }">
+            <div :style="{ display: 'flex', width: '460px', justifyContent: 'flex-end', fontFamily: 'Oswald', fontWeight: 600, fontSize: '20px', color: '#f4efe6' }">{{ ageA }}</div>
+            <div :style="{ display: 'flex', width: '120px', justifyContent: 'center', fontFamily: 'Oswald', fontWeight: 500, fontSize: '14px', letterSpacing: '2px', color: '#9a958c' }">AGE</div>
+            <div :style="{ display: 'flex', width: '460px', fontFamily: 'Oswald', fontWeight: 600, fontSize: '20px', color: '#f4efe6' }">{{ ageB }}</div>
           </div>
         </div>
 

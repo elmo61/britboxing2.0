@@ -7,7 +7,11 @@
 const props = defineProps<{ title: string, boutSlug: string }>()
 
 const route = useRoute()
-const origin = useRequestURL().origin
+// useRequestURL().origin reflects whoever's actually asking — during static
+// prerendering that's Nitro's own internal crawler (http://localhost:PORT),
+// not the public site, so it would bake wrong URLs into the static HTML.
+// site.url is deterministic regardless of who's rendering.
+const origin = useSiteConfig().url
 const pageUrl = computed(() => origin + route.path)
 
 // The build's stabilize-share-images.mjs step rewrites every fight/article
@@ -18,6 +22,8 @@ const pageUrl = computed(() => origin + route.path)
 // unstable URL to the live DOM on hydration even though the static HTML any
 // crawler actually reads was already correctly rewritten.
 const cardImageUrl = computed(() => `${origin}/cards/${props.boutSlug}.png`)
+const cardImageSquareUrl = computed(() => `${origin}/cards/${props.boutSlug}-square.png`)
+const cardImageSmallUrl = computed(() => `${origin}/cards/${props.boutSlug}-small.png`)
 
 const xHref = computed(() =>
   `https://twitter.com/intent/tweet?text=${encodeURIComponent(props.title)}&url=${encodeURIComponent(pageUrl.value)}`)
@@ -58,7 +64,9 @@ async function copyLink() {
     <button type="button" class="sharebar__btn" @click="copyLink">
       {{ copyState === 'copied' ? 'Copied!' : copyState === 'failed' ? 'Copy failed' : 'Copy link' }}
     </button>
-    <a v-if="cardImageUrl" :href="cardImageUrl" target="_blank" rel="noopener noreferrer" class="sharebar__btn sharebar__btn--image">View share image ↗</a>
+    <a :href="cardImageUrl" target="_blank" rel="noopener noreferrer" class="sharebar__btn sharebar__btn--image">Share image ↗</a>
+    <a :href="cardImageSquareUrl" target="_blank" rel="noopener noreferrer" class="sharebar__btn sharebar__btn--image">Square ↗</a>
+    <a :href="cardImageSmallUrl" target="_blank" rel="noopener noreferrer" class="sharebar__btn sharebar__btn--image">Small ↗</a>
   </div>
 </template>
 

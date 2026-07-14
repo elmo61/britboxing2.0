@@ -3,11 +3,19 @@
 // props it was given (fighter names, records, status, result...), so a bout's
 // image URL changes every time its status/result/date changes — any link
 // already shared with the old URL goes dead the next time the site deploys.
-// This gives every bout a PERMANENT URL instead: /cards/{bout-slug}.png. The
-// image behind that URL still updates in place (new render each deploy), but
-// the URL itself never changes and is never dropped, because every bout row
-// is permanent and every bout page is always linked from /schedule or
-// /results, so it's always re-crawled and re-stabilized on every build.
+// This gives every bout a PERMANENT URL instead: /cards/{bout-slug}.png (plus
+// -square.png / -small.png for the alternate sizes each fight page also
+// requests). The image behind each URL still updates in place (new render
+// each deploy), but the URL itself never changes and is never dropped,
+// because every bout row is permanent and every bout page is always linked
+// from /schedule or /results, so it's always re-crawled and re-stabilized on
+// every build.
+//
+// Each fight page carries THREE og:image entries in document order (hero,
+// square, small — see pages/fights/[bout]/index.vue) — valid per the Open
+// Graph spec (multiple og:image is explicitly supported; platforms that only
+// want one just use the first / best-fit by the accompanying width/height).
+// Distinguish them by their declared og:image:width.
 import { readdir, readFile, writeFile, copyFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join, dirname, relative, sep } from 'node:path'
@@ -32,6 +40,9 @@ function boutSlugFromRelPath(relPath) {
   return idx === -1 ? null : (parts[idx + 1] ?? null)
 }
 
+// Declared og:image:width -> stable filename suffix.
+const SUFFIX_BY_WIDTH = { 1200: '', 1080: '-square', 600: '-small' }
+
 async function main() {
   if (!existsSync(publicDir)) {
     console.error(`[stabilize-share-images] ${publicDir} does not exist — run "nuxt generate" first.`)
@@ -42,44 +53,60 @@ async function main() {
   const cardsDir = join(publicDir, 'cards')
   await mkdir(cardsDir, { recursive: true })
 
-  const copiedSlugs = new Set()
+  const copiedTargets = new Set() // "{slug}{suffix}" already copied this run
   let pagesUpdated = 0
+  let boutsSeen = new Set()
 
   for (const file of files) {
     const slug = boutSlugFromRelPath(relative(publicDir, file))
     if (!slug) continue // not a /fights/... page — uses the static default card, already stable
 
-    const html = await readFile(file, 'utf8')
-    const ogMatch = html.match(/<meta property="og:image" content="([^"]+)"/)
-    if (!ogMatch) continue
-    const dynamicUrl = ogMatch[1]
-    if (dynamicUrl.includes('/cards/')) continue // already stabilized (safe to re-run)
+    let html = await readFile(file, 'utf8')
+    const urls = [...html.matchAll(/<meta property="og:image" content="([^"]+)">/g)].map(m => m[1])
+    const widths = [...html.matchAll(/<meta property="og:image:width" content="(\d+)">/g)].map(m => Number(m[1]))
+    if (!urls.length) continue
 
-    const origin = new URL(dynamicUrl).origin
-    const stableUrl = `${origin}/cards/${slug}.png`
-    const stableFile = join(cardsDir, `${slug}.png`)
+    boutsSeen.add(slug)
+    let changed = false
 
-    if (!copiedSlugs.has(slug)) {
-      const dynamicFile = join(publicDir, new URL(dynamicUrl).pathname)
-      if (!existsSync(dynamicFile)) {
-        console.warn(`[stabilize-share-images] source image missing for ${slug}, skipping: ${dynamicFile}`)
+    for (let i = 0; i < urls.length; i++) {
+      const dynamicUrl = urls[i]
+      if (dynamicUrl.includes('/cards/')) continue // already stabilized (safe to re-run)
+
+      const suffix = SUFFIX_BY_WIDTH[widths[i]]
+      if (suffix === undefined) {
+        console.warn(`[stabilize-share-images] unrecognized og:image width ${widths[i]} for ${slug}, leaving as-is: ${dynamicUrl}`)
         continue
       }
-      await copyFile(dynamicFile, stableFile)
-      copiedSlugs.add(slug)
+
+      const origin = new URL(dynamicUrl).origin
+      const stableUrl = `${origin}/cards/${slug}${suffix}.png`
+      const target = `${slug}${suffix}`
+
+      if (!copiedTargets.has(target)) {
+        const dynamicFile = join(publicDir, new URL(dynamicUrl).pathname)
+        if (!existsSync(dynamicFile)) {
+          console.warn(`[stabilize-share-images] source image missing for ${target}, skipping: ${dynamicFile}`)
+          continue
+        }
+        await copyFile(dynamicFile, join(cardsDir, `${target}.png`))
+        copiedTargets.add(target)
+      }
+
+      // Global replace: catches every og:image occurrence of this exact URL
+      // plus twitter:image/twitter:image:src (which always mirror the hero).
+      const escaped = dynamicUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      html = html.replace(new RegExp(escaped, 'g'), stableUrl)
+      changed = true
     }
 
-    const updated = html
-      .replace(/(<meta property="og:image" content=")[^"]+(")/g, `$1${stableUrl}$2`)
-      .replace(/(<meta name="twitter:image" content=")[^"]+(")/g, `$1${stableUrl}$2`)
-      .replace(/(<meta name="twitter:image:src" content=")[^"]+(")/g, `$1${stableUrl}$2`)
-    if (updated !== html) {
-      await writeFile(file, updated, 'utf8')
+    if (changed) {
+      await writeFile(file, html, 'utf8')
       pagesUpdated++
     }
   }
 
-  console.log(`[stabilize-share-images] gave ${copiedSlugs.size} bout(s) a permanent /cards/ URL across ${pagesUpdated} page(s).`)
+  console.log(`[stabilize-share-images] gave ${boutsSeen.size} bout(s) permanent /cards/ URLs (${copiedTargets.size} image files) across ${pagesUpdated} page(s).`)
 }
 
 main()
