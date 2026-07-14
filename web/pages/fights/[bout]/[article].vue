@@ -40,6 +40,7 @@ defineOgImage('FightCard', fightCardProps(f.value))
     <NuxtLink to="/" class="back">← Latest</NuxtLink>
 
     <FightHeader :bout="f.bout" :fighter-a="f.fighterA" :fighter-b="f.fighterB" />
+    <ShareBar :title="article.title" />
 
     <article>
       <h2 class="article-title">{{ article.title }}</h2>
