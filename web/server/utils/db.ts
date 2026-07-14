@@ -85,6 +85,32 @@ export async function getSchedule() {
   }))
 }
 
+/** Completed fights with results, newest first, each linked to its result article if one exists. */
+export async function getResults() {
+  const sb = useSupabase()
+  const { data, error } = await sb
+    .from('bouts')
+    .select('slug, weight_class, event_date, result, fighter_a_snapshot, fighter_b_snapshot, '
+      + 'articles(slug, status, published_at)')
+    .eq('status', 'completed')
+    .order('event_date', { ascending: false, nullsFirst: false })
+  if (error) throw createError({ statusCode: 502, statusMessage: error.message })
+  return (data ?? []).map((b: any) => {
+    const reportArticle = (b.articles ?? [])
+      .filter((a: any) => a.status === 'result')
+      .sort((x: any, y: any) => (y.published_at ?? '').localeCompare(x.published_at ?? ''))[0]
+    return {
+      slug: b.slug,
+      href: `/fights/${b.slug}`,
+      reportHref: reportArticle ? `/fights/${b.slug}/${reportArticle.slug}` : null,
+      matchup: matchupOf(b),
+      division: b.weight_class ?? '',
+      eventDate: b.event_date,
+      result: b.result ?? null,
+    }
+  })
+}
+
 /** Roster for the fighters search page. */
 export async function getFighterList() {
   const sb = useSupabase()

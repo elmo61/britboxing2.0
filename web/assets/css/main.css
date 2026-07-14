@@ -261,12 +261,13 @@ footer.attribution a { color: var(--muted); }
 .mainnav a.is-active { color: var(--ink); }
 .mainnav a.is-active::after { content: ""; display: block; height: 2px; margin-top: 5px; background: var(--gold); border-radius: 2px; }
 
-/* mobile: 3 nav items don't fit beside the wordmark — stack them under it
-   and drop the tagline to keep the bar compact */
+/* mobile: nav items don't fit beside the wordmark — stack them under it and
+   drop the tagline to keep the bar compact. flex-wrap is the safety net if a
+   future nav item ever pushes the row past the viewport width. */
 @media (max-width: 560px) {
   .site-head__inner { flex-direction: column; align-items: stretch; gap: 8px; }
   .brand__tagline { display: none; }
-  .mainnav { gap: 4px; }
+  .mainnav { gap: 4px; flex-wrap: wrap; }
   .mainnav a { padding: 6px 12px 6px 0; }
 }
 
